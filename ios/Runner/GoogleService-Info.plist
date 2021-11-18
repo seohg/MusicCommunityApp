@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>833104939134-0dgjsd1qun447udhnp3fe5mifcupj620.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.833104939134-0dgjsd1qun447udhnp3fe5mifcupj620</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDkLAbhwDHZGt3OnGCP-SnPIqhKiIzI95I</string>
+	<key>GCM_SENDER_ID</key>
+	<string>833104939134</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.modu</string>
+	<key>PROJECT_ID</key>
+	<string>modu-e0664</string>
+	<key>STORAGE_BUCKET</key>
+	<string>modu-e0664.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:833104939134:ios:0f0da50350f603a567f02f</string>
+	<key>DATABASE_URL</key>
+	<string>https://modu-e0664-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "833104939134",
+    "firebase_url": "https://modu-e0664-default-rtdb.firebaseio.com",
+    "project_id": "modu-e0664",
+    "storage_bucket": "modu-e0664.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833104939134:android:b5dcd9392a19169b67f02f",
+        "android_client_info": {
+          "package_name": "com.example.modu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833104939134-49p3g3v3vslc1rh9f0tgolsglcsqgfmr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.modu",
+            "certificate_hash": "978c2d69c58c3e78c4095091a7f69c1e771f6910"
+          }
+        },
+        {
+          "client_id": "833104939134-ppbttt8va8f1v5gpl57lvv2unnkmuim4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJi2eJ8CA-LvLPoQkRwljuWzmt6ouHgAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833104939134-ppbttt8va8f1v5gpl57lvv2unnkmuim4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "833104939134-0dgjsd1qun447udhnp3fe5mifcupj620.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.modu"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
