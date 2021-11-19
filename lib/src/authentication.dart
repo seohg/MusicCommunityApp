@@ -4,8 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import '../board.dart';
 import '../home.dart';
-import '../item.dart';
 import '../main.dart';
 import 'widgets.dart';
 
@@ -119,7 +119,7 @@ class Authentication extends StatelessWidget {
                 });
         return MyHomePage();
     }
-    return ItemPage();
+    return BoardPage();
   }
 }
 

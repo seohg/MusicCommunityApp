@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modu/profile.dart';
 import 'package:modu/src/authentication.dart';
+
+import 'board.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -47,6 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
               leading: Icon(Icons.person, color: Colors.black),
               title: const Text('Profile'),
               onTap: () {
+                Navigator.push(context, MaterialPageRoute<void>(
+                  builder: (context) => ProfilePage(),
+                ));
               },
             ),
             ListTile(
@@ -152,7 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(width:200),
                 IconButton(
                   icon: Icon(Icons.arrow_right_alt),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(builder: (context)=>BoardPage()),
+                    );
+                  },
                 ),
               ],
 

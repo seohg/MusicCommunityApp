@@ -65,7 +65,7 @@ class ApplicationState extends ChangeNotifier {
         _loginState = ApplicationLoginState.loggedIn;
         _productSubscription = FirebaseFirestore.instance
             .collection('product')
-            .orderBy('name', descending: false)
+            .orderBy('title', descending: false)
             .snapshots()
             .listen((snapshot) {
           _productMessages = [];
@@ -73,8 +73,9 @@ class ApplicationState extends ChangeNotifier {
             _productMessages.add(
               Product(
                 id: document.id,
-                name: document.data()['name'] as String,
-                description: document.data()['description'] as String,
+                title: document.data()['title'] as String,
+                contents: document.data()['contents'] as String,
+                writer: document.data()['writer'] as String,
                 UID: document.data()['UID'] as String,
                 likeList: document.data()['likeList'] as List,
                 create: document.data()['create'] as Timestamp,
@@ -111,14 +112,18 @@ class ApplicationState extends ChangeNotifier {
     if (_loginState != ApplicationLoginState.loggedIn) {
       throw Exception('Must be logged in');
     }
+    String writer;
+    writer = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.displayName)!;
 
 
     return FirebaseFirestore.instance
         .collection('product')
         .add(<String, dynamic>{
       'id': '',
-      'name': name,
-      'description': description,
+      'title': name,
+      'contents': description,
+      'writer':writer,
       'create': FieldValue.serverTimestamp(),
       'update': FieldValue.serverTimestamp(),
       'UID':FirebaseAuth.instance.currentUser!.uid,
@@ -134,17 +139,18 @@ class ApplicationState extends ChangeNotifier {
         .collection('product')
         .doc(id)
         .update({
-          'name': name,
-          'description': description,
+          'title': name,
+          'contents': description,
           'update': FieldValue.serverTimestamp(),
           'UID':FirebaseAuth.instance.currentUser!.uid,
         });
     notifyListeners();
   }
   Future<void> sort(bool desc) async {
+
     _productSubscription = FirebaseFirestore.instance
         .collection('product')
-        .orderBy('name', descending: desc)
+        .orderBy('title', descending: desc)
         .snapshots()
         .listen((snapshot) {
       _productMessages = [];
@@ -152,8 +158,9 @@ class ApplicationState extends ChangeNotifier {
         _productMessages.add(
           Product(
             id: document.id,
-            name: document.data()['name'] as String,
-            description: document.data()['description'] as String,
+            title: document.data()['title'] as String,
+            contents: document.data()['contents'] as String,
+            writer:document.data()['writer'] as String,
             UID: document.data()['UID'] as String,
             likeList: document.data()['likeList'] as List,
             create: document.data()['create'] as Timestamp,

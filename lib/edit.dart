@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'item.dart';
+import 'board.dart';
 import 'main.dart';
 import 'model/product.dart';
 import 'dart:io';
@@ -27,8 +27,8 @@ class EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    _productnameController.text = product.name;
-    _descriptionController.text = product.description;
+    _productnameController.text = product.title;
+    _descriptionController.text = product.contents;
     return Scaffold(
       //key: _scaffoldKey,
       appBar: AppBar(
@@ -51,7 +51,7 @@ class EditPageState extends State<EditPage> {
 
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(builder: (context)=>ItemPage()),
+                  MaterialPageRoute<void>(builder: (context)=>BoardPage()),
                 );
               },
             ),
@@ -62,13 +62,7 @@ class EditPageState extends State<EditPage> {
       ),
       body: ListView(
           children: [
-            SizedBox(
-              height: 300.0,
-              child: image == ""
-                  ? Image.network(
-                  'https://handong.edu/site/handong/res/img/logo.png')
-                  : Image.file(File(image)),
-            ),
+
             Container(
               padding: EdgeInsets.fromLTRB(200, 0.0, 0, 0),
               child: IconButton(
