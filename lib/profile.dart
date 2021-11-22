@@ -28,6 +28,7 @@ class ProfilePageState extends State<ProfilePage> {
 @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       appBar: AppBar(
         backgroundColor: Colors.black,
         centerTitle: true,
@@ -45,16 +46,7 @@ class ProfilePageState extends State<ProfilePage> {
             builder: (context, appState, _) =>
                 Row(
                   children: [
-                      IconButton(
-                        icon: Icon(Icons.exit_to_app),
-                        onPressed: (){
-                          appState.signOut();
-                          FirebaseAuth.instance.signOut();
-                          Navigator.push(context, MaterialPageRoute<void>(
-                            builder: (context) => LoginPage(),
-                          ));
-                        },
-                      ),
+
                   ],
                 ),
           ),
@@ -68,11 +60,11 @@ class ProfilePageState extends State<ProfilePage> {
           children: [
             FirebaseAuth.instance.currentUser!.isAnonymous
               ? Image.network('https://handong.edu/site/handong/res/img/logo.png',
-                            width: 600,
+                            width: 400,
                             height: 240,
                             fit: BoxFit.cover,)
             : Image.network('${FirebaseAuth.instance.currentUser!.photoURL}',
-                          width: 600,
+                          width: 300,
                           height: 240,
                           fit: BoxFit.cover,),
 
@@ -93,7 +85,7 @@ class ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -109,7 +101,7 @@ class ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Colors.white,
                     ),
                   ),
 
@@ -121,7 +113,7 @@ class ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Colors.white,
                     ),
                   )
                 else
@@ -129,7 +121,7 @@ class ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Colors.white,
                   ),
                 ),
                 if ((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(!edit))
@@ -141,7 +133,7 @@ class ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Colors.white,
                   ),
                 )
                 else
@@ -149,14 +141,14 @@ class ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: Colors.white,
                     ),
                   ),
 
 
                 if ((!FirebaseAuth.instance.currentUser!.isAnonymous))
                   TextButton(
-                    child: Text(edit?'edit':'save', style: TextStyle(color: Colors.blue)),
+                    child: Text(edit?'edit':'save', style: TextStyle(color: Colors.white)),
                     onPressed: () {
                       setState(() {
                         if (edit == false) {

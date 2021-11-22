@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:modu/profile.dart';
 import 'add.dart';
 import 'edit.dart';
+import 'messagewrite.dart';
 import 'model/mess.dart';
 import 'model/product.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -33,51 +34,95 @@ class MessagePageState extends State<MessagePage> {
     final ThemeData theme = Theme.of(context);
 
     return messages.map((mess) {
-      bool checker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+      String temp;
+      List<String> redundant=[''];
+      bool redun=true;
+      if((mess.writer.toString()==auth.currentUser!.displayName.toString())&&(mess.receiver.toString()!=auth.currentUser!.displayName.toString())) {
+        temp = mess.receiver;
+        for(int i=0;i<redundant.length;i++) {
+          if(redundant[i]==temp) {
+            redun = false;
+            break;
+          }
+          else if(redundant[i]!=temp){
+            redun = true;
+          }
+        }
+      }
+       else if ((mess.writer.toString()!=auth.currentUser!.displayName.toString())&&(mess.receiver.toString()==auth.currentUser!.displayName.toString())) {
+        temp = mess.writer;
+        for(int i=0;i<redundant.length;i++) {
+          if(redundant[i]==temp) {
+            redun=false;
+            break;
+          }
+          else if (redundant[i]!=temp){
+            redundant.add(temp);
+
+            redun=true;
+          }
+        }
+      }
+        else
+        temp="";
+      if(redun==true)
+      redundant.add(temp);
+
+        bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+
+      bool checker= achecker && redun;
+
+
       return Card(
         clipBehavior: Clip.antiAlias,
         elevation: 5,
         child: checker ?Row(
           children: <Widget>[
             SizedBox(width: 12.0),
-            Container(
-              height: 150,
-              child:
-              Expanded(
-              child:  Padding(
-                padding: const EdgeInsets.only(left: 10, top: 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(width: 8.0),
-                    Column(
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(builder: (context)=>MessageWritePage(message: mess, title: temp)));
+              },
+              child: Container(
+                height: 100,
+                child:
+                Expanded(
+                  child:  Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 5),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
-                          mess.content,
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                        ),
-                        Text(
-                          "From: " +mess.writer,
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "To: "+mess.receiver,
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
+                        SizedBox(width: 8.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              mess.content,
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                            ),
+                            Text(
+                              "From: " +mess.writer,
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "To: "+mess.receiver,
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ) ,
               ),
-            ) ,
             ),
           ],
-
         ) :null,
       );
     }).toList();
@@ -100,18 +145,6 @@ class MessagePageState extends State<MessagePage> {
             textAlign: TextAlign.center),
 
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.add,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(builder: (context)=>AddPage()),
-              );
-            },
-
-          ),
         ],
       ),
 
@@ -133,6 +166,14 @@ class MessagePageState extends State<MessagePage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+
+        },
+        label: const Text('Write a new message'),
+        icon: const Icon(Icons.message),
+        backgroundColor: Colors.grey,
       ),
     );
   }
