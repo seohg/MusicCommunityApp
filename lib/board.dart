@@ -439,8 +439,8 @@ class DetailPageState extends State<DetailPage> {
                             icon: Icon(Icons.add),
                             onPressed: () {
                               setState(() {
-                                _commentController.text="";
                                   appState.commentadd(product.id,_commentController.text);
+                                  _commentController.text="";
                               });
                             },
                           )
