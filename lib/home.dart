@@ -38,14 +38,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List> getMessageData(int num) async {
     // Get docs from collection reference
+    int counter =0;
     QuerySnapshot querySnapshot = await _collectionRefe.get();
     // Get data from docs and convert map to List
     List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     var picked;
     for(int i=0; i <allData.length; i++) {
       final temp = allData[i];
-      if (temp["receiver"].toString()==auth.currentUser!.displayName.toString())
-        picked = temp;
+      if ((temp["receiver"].toString()==auth.currentUser!.displayName.toString())&&counter==num){
+      picked = temp;
+      counter++;
+      }
     }
     List fin = [
       picked["content"].toString(),
@@ -548,27 +551,95 @@ class _MyHomePageState extends State<MyHomePage> {
                           }
                         }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: getMessageData(1),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(url.data[0]),
+                                  Text("from: " + url.data[1]),
+                                  Text(url.data[3]),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: getMessageData(2),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(url.data[0]),
+                                  Text("from: " + url.data[1]),
+                                  Text(url.data[3]),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
                     Container(
                       width: 115.0,

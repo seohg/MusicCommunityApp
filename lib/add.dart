@@ -18,15 +18,16 @@ class AddPageState extends State<AddPage> {
     return Scaffold(
       //key: _scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         centerTitle: true,
         leading: TextButton(
-            child:Text('close',style:TextStyle(color: Colors.black)),
+            child:Text('close',style:TextStyle(color: Colors.white)),
             onPressed: (){
               Navigator.pop(context);
             },
           ),
 
-        title: Text('Add',textAlign: TextAlign.center),
+        title: Text('글 작성',textAlign: TextAlign.center),
         actions: <Widget>[
           Consumer<ApplicationState>(
           builder: (context, appState, _) =>
@@ -54,7 +55,7 @@ class AddPageState extends State<AddPage> {
                   child: TextField(
                     controller: _productnameController,
                     decoration: InputDecoration(
-                      labelText: 'Product Name',
+                      labelText: 'title',
                     ),
                   ),
                 ),
@@ -64,7 +65,7 @@ class AddPageState extends State<AddPage> {
                   child: TextField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
-                      labelText: 'Description',
+                      labelText: 'Contents',
                     ),
                   ),
                 ),

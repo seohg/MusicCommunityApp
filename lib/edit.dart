@@ -16,7 +16,6 @@ class EditPage extends StatefulWidget {
 
 class EditPageState extends State<EditPage> {
   late Product product = widget.product;
-  final picker = ImagePicker();
 
   final _productnameController = TextEditingController();
   final _priceController = TextEditingController();
@@ -32,9 +31,10 @@ class EditPageState extends State<EditPage> {
     return Scaffold(
       //key: _scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         centerTitle: true,
         leading: TextButton(
-          child:Text('close',style:TextStyle(color: Colors.black)),
+          child:Text('close',style:TextStyle(color: Colors.white)),
           onPressed: (){
             Navigator.pop(context);
           },
@@ -63,15 +63,6 @@ class EditPageState extends State<EditPage> {
       body: ListView(
           children: [
 
-            Container(
-              padding: EdgeInsets.fromLTRB(200, 0.0, 0, 0),
-              child: IconButton(
-                icon: Icon(Icons.camera_alt),
-                color: Colors.black,
-                onPressed: () {
-                },
-              ),
-            ),
             Column(
               children: <Widget>[
                 Padding(
