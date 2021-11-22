@@ -49,55 +49,88 @@ class Authentication extends StatelessWidget {
 
       case ApplicationLoginState.loggedOut:
         return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child:
-              Column(
-                  children: [
-                    SizedBox(height:100),
-                    Container(
-                      height:300,
-                      width:400,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        border: Border.all(
-                          color:Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: Container(
-                        height: 250,
-                        width: 300,
+          backgroundColor: Colors.white,
+          body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/background.jpg"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child:Center(
+                child:
+                Column(
+                    children: [
+                      SizedBox(height:160),
+                      Container(
+                        width:350,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          border: Border.all(
-                            color:Colors.white,
-                          ),
+                            color: Colors.black,
+                            border: Border.all(
+                              color:Colors.black,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow:
+                            [BoxShadow(color: Colors.black.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 3,)]
+
                         ),
-                        child: Image(image: AssetImage('assets/logo.png'),width: 300,height:100,fit:BoxFit.contain),
+                        child: SizedBox(
+                          width:100,
+                          child:Image(image: AssetImage('assets/logo.png'),width:100,height:100),
+                        ),
+
+
                       ),
-                    ),
 
-                    SizedBox(height:100),
-                    OutlinedButton.icon(
-                      icon: Icon(Icons.android,color: Colors.black),
-                      label:Text("GOOGLE",style:TextStyle(color: Colors.black)),
-                      onPressed: () {
-                        signInWithGoogle();
-                        Navigator.pop(context);
-                      },
-                    ),
-                    OutlinedButton.icon(
-                      icon: Icon(Icons.switch_account,color: Colors.black),
-                      label:Text("   Guest   ",style:TextStyle(color: Colors.black)),
-                      onPressed:(){
-                        FirebaseAuth.instance.signInAnonymously();
-                        Navigator.pop(context);
-                      },
-                    )
+                      SizedBox(height:130),
 
-                  ]),
-            ));
+                      SizedBox(height:80),
+                      SizedBox(
+                        width: 300.0,
+                        height: 60.0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary:Colors.white,
+                            shadowColor: Colors.black,
+                            elevation: 4.0,
+                            side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
+                          ),
+                          child:Text("Logging in with Google",style:TextStyle(fontSize: 18,color: Colors.black)),
+                          onPressed: () {
+                            signInWithGoogle();
+                            Navigator.pop(context);
+
+                          },
+                        ),
+                      ),
+                      SizedBox(height:20),
+
+                      SizedBox(
+                          width: 300.0,
+                          height: 60.0,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary:Colors.white,
+                              shadowColor: Colors.black,
+                              elevation: 4.0,
+                              side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
+                            ),
+
+                            child:Text("Logging in as a guest",style:TextStyle(fontSize: 18,color: Colors.black)),
+                            onPressed:(){
+                              FirebaseAuth.instance.signInAnonymously();
+                              Navigator.pop(context);
+                            },
+                          )
+                      ),
+
+                    ]),
+              )),
+        );
 
       case ApplicationLoginState.loggedIn:
         FirebaseAuth.instance.currentUser!.isAnonymous

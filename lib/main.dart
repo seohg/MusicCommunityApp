@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'model/mess.dart';
 import 'model/product.dart';
 import 'src/authentication.dart';
 
@@ -34,6 +35,7 @@ class App extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const HomePage(),
+
     );
   }
 }
@@ -87,11 +89,36 @@ class ApplicationState extends ChangeNotifier {
           }
           notifyListeners();
         });
+        _messageSubscription = FirebaseFirestore.instance
+            .collection('message')
+            .orderBy('created', descending: false)
+            .snapshots()
+            .listen((snapshot) {
+          _messMessages = [];
+          for (final document in snapshot.docs) {
+            _messMessages.add(
+              Mess(
+                id: document.id,
+                content: document.data()['content'] as String,
+                writer: document.data()['writer'] as String,
+                UID: document.data()['UID'] as String,
+                created: document.data()['created'] as Timestamp,
+                sort: document.data()['sort'] as String,
+                receiver: document.data()['receiver'] as String,
+              ),
+            );
+            FirebaseFirestore.instance.collection('message').doc(document.id).update({'id': document.id,});
+          }
+          notifyListeners();
+        });
+
         // to here
       } else {
         _loginState = ApplicationLoginState.loggedOut;
         _productMessages = [];
         _productSubscription?.cancel();
+        _messMessages=[];
+        _messageSubscription?.cancel();
       }
       notifyListeners();
     });
@@ -100,8 +127,11 @@ class ApplicationState extends ChangeNotifier {
   ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
   ApplicationLoginState get loginState => _loginState;
   StreamSubscription<QuerySnapshot>? _productSubscription;
+  StreamSubscription<QuerySnapshot>? _messageSubscription;
   List<Product> _productMessages = [];
   List<Product> get productMessages => _productMessages;
+  List<Mess> _messMessages = [];
+  List<Mess> get messMessages => _messMessages;
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -139,11 +169,11 @@ class ApplicationState extends ChangeNotifier {
         .collection('product')
         .doc(id)
         .update({
-          'title': name,
-          'contents': description,
-          'update': FieldValue.serverTimestamp(),
-          'UID':FirebaseAuth.instance.currentUser!.uid,
-        });
+      'title': name,
+      'contents': description,
+      'update': FieldValue.serverTimestamp(),
+      'UID':FirebaseAuth.instance.currentUser!.uid,
+    });
     notifyListeners();
   }
   Future<void> sort(bool desc) async {
@@ -182,14 +212,9 @@ class ApplicationState extends ChangeNotifier {
         .collection('user')
         .doc(id)
         .update({
-          'status_message': status,
-        });
+      'status_message': status,
+    });
     //notifyListeners();
   }
 
 }
-
-
-
-
-

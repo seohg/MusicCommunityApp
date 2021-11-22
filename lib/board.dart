@@ -81,9 +81,11 @@ class BoardPageState extends State<BoardPage> {
                                     style: TextButton.styleFrom(
                                       padding:EdgeInsets.zero,
                                       minimumSize: Size(20,40),
+
                                     ),
                                     child: const Text('more',
                                       style : TextStyle(
+                                        color: Colors.black,
                                         fontSize: 8,
                                       ),
                                     ),
@@ -163,7 +165,7 @@ class BoardPageState extends State<BoardPage> {
                 ),
                 underline: Container(
                   height: 2,
-                  color: Colors.deepPurpleAccent,
+                  color: Colors.black,
                 ),
                 onChanged: (String? newValue) {
                   setState(() {
@@ -179,6 +181,7 @@ class BoardPageState extends State<BoardPage> {
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
+
                     child: Text(value),
                   );
                 }).toList(),
@@ -231,6 +234,7 @@ class DetailPageState extends State<DetailPage> {
       //key: _scaffoldKey,
 
       appBar: AppBar(
+        backgroundColor: Colors.black,
         centerTitle: true,
         leading: IconButton(
 
@@ -303,7 +307,8 @@ class DetailPageState extends State<DetailPage> {
                       Padding(
                         padding:EdgeInsets.only(top:15),
                       ),
-                      Row(
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children:  <Widget>[
                           Text(product.title,
                             style: TextStyle(
@@ -315,7 +320,17 @@ class DetailPageState extends State<DetailPage> {
                           Padding(
                             padding:EdgeInsets.only(right:15),
                           ),
-                          IconButton(
+                          Text(product.contents,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color:Colors.blue,
+                            ),
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                            children:  <Widget>[
+                              IconButton(
                             icon: Icon(Icons.thumb_up),
                             color: Colors.red,
                             iconSize: 30.0,
@@ -354,21 +369,11 @@ class DetailPageState extends State<DetailPage> {
                               fontWeight: FontWeight.bold,
                               color:Colors.blue,
                             ),
-                          ),
+                          ),],),
                         ],
                       ),
                       Padding(
                         padding:EdgeInsets.only(top:10),
-                      ),
-                      Row(
-                        children:  <Widget>[
-
-                          Padding(
-                            padding:EdgeInsets.only(right:15),
-                          ),
-
-
-                        ],
                       ),
                       Padding(
                         padding:EdgeInsets.only(top:10),
@@ -380,13 +385,7 @@ class DetailPageState extends State<DetailPage> {
                       Padding(
                         padding:EdgeInsets.only(top:10),
                       ),
-                      Text(product.contents,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color:Colors.blue,
-                        ),
-                      ),
+
                       Padding(
                         padding:EdgeInsets.only(top:10),
                       ),

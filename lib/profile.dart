@@ -25,10 +25,12 @@ class ProfilePageState extends State<ProfilePage> {
   ProfilePageState(){
     getS();
   }
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
@@ -44,16 +46,7 @@ class ProfilePageState extends State<ProfilePage> {
             builder: (context, appState, _) =>
                 Row(
                   children: [
-                      IconButton(
-                        icon: Icon(Icons.exit_to_app),
-                        onPressed: (){
-                          appState.signOut();
-                          FirebaseAuth.instance.signOut();
-                          Navigator.push(context, MaterialPageRoute<void>(
-                            builder: (context) => LoginPage(),
-                          ));
-                        },
-                      ),
+
                   ],
                 ),
           ),
@@ -66,14 +59,14 @@ class ProfilePageState extends State<ProfilePage> {
 
           children: [
             FirebaseAuth.instance.currentUser!.isAnonymous
-              ? Image.network('https://handong.edu/site/handong/res/img/logo.png',
-                            width: 600,
-                            height: 240,
-                            fit: BoxFit.cover,)
-            : Image.network('${FirebaseAuth.instance.currentUser!.photoURL}',
-                          width: 600,
-                          height: 240,
-                          fit: BoxFit.cover,),
+                ? Image.network('https://handong.edu/site/handong/res/img/logo.png',
+              width: 400,
+              height: 240,
+              fit: BoxFit.cover,)
+                : Image.network('${FirebaseAuth.instance.currentUser!.photoURL}',
+              width: 300,
+              height: 240,
+              fit: BoxFit.cover,),
 
             Container(
               padding: EdgeInsets.all(30),
@@ -92,94 +85,94 @@ class ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                  const Divider(
-                    height: 1.0,
-                    color: Colors.black,
-                  ),
+                    const Divider(
+                      height: 1.0,
+                      color: Colors.black,
+                    ),
 
-                  Text(
+                    Text(
                       FirebaseAuth.instance.currentUser!.isAnonymous
-                      ? 'Anonymous'
-                      : '${FirebaseAuth.instance.currentUser!.email}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                          ? 'Anonymous'
+                          : '${FirebaseAuth.instance.currentUser!.email}',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
 
-                Padding(
-                  padding: EdgeInsets.only(top: 10),
-                ),
-                if(!FirebaseAuth.instance.currentUser!.isAnonymous)
-                  Text('${FirebaseAuth.instance.currentUser!.displayName}',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                    Padding(
+                      padding: EdgeInsets.only(top: 10),
                     ),
-                  )
-                else
-                  Text('Anonymous',
-                  style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                  ),
-                ),
-                if ((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(!edit))
-                  TextField(
+                    if(!FirebaseAuth.instance.currentUser!.isAnonymous)
+                      Text('${FirebaseAuth.instance.currentUser!.displayName}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      )
+                    else
+                      Text('Anonymous',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    if ((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(!edit))
+                      TextField(
                         controller: _statusController,
                       )
-                else if((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(edit))
-                  Text(s,
-                  style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                  ),
-                )
-                else
-                  Text(s,
-                    style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                    ),
-                  ),
+                    else if((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(edit))
+                      Text(s,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      )
+                    else
+                      Text(s,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
 
 
-                if ((!FirebaseAuth.instance.currentUser!.isAnonymous))
-                  TextButton(
-                    child: Text(edit?'edit':'save', style: TextStyle(color: Colors.blue)),
-                    onPressed: () {
-                      setState(() {
-                        if (edit == false) {
-                          print("bye");
-                          appState.profileEdit(FirebaseAuth.instance.currentUser!.uid,_statusController.text);
-                          getS();
-                          //appState.notifyListeners();
-                          edit = true;
-                        } else {
-                          _statusController.text = s;
-                          edit = false;
-                        }
-                      });
+                    if ((!FirebaseAuth.instance.currentUser!.isAnonymous))
+                      TextButton(
+                        child: Text(edit?'edit':'save', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          setState(() {
+                            if (edit == false) {
+                              print("bye");
+                              appState.profileEdit(FirebaseAuth.instance.currentUser!.uid,_statusController.text);
+                              getS();
+                              //appState.notifyListeners();
+                              edit = true;
+                            } else {
+                              _statusController.text = s;
+                              edit = false;
+                            }
+                          });
 
-                    },
-                  )
+                        },
+                      )
 
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
       ),
-    ),
     );
   }
 }
