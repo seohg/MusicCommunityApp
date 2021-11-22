@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -49,87 +50,87 @@ class Authentication extends StatelessWidget {
 
       case ApplicationLoginState.loggedOut:
         return Scaffold(
-          backgroundColor: Colors.white,
-          body: Container(
+            backgroundColor: Colors.white,
+            body: Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/background.jpg"),
-                  fit: BoxFit.cover,
-                ),
+                  image: DecorationImage(
+                    image: AssetImage("assets/background.jpg"),
+                    fit: BoxFit.cover,
+                  ),
               ),
-              child:Center(
-                child:
-                Column(
-                    children: [
-                      SizedBox(height:160),
-                      Container(
-                        width:350,
-                        decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(
-                              color:Colors.black,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow:
-                            [BoxShadow(color: Colors.black.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 3,)]
-
+            child:Center(
+              child:
+              Column(
+                  children: [
+                    SizedBox(height:160),
+                    Container(
+                      width:350,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(
+                          color:Colors.black,
                         ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow:
+                        [BoxShadow(color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 3,)]
+
+                      ),
                         child: SizedBox(
                           width:100,
                           child:Image(image: AssetImage('assets/logo.png'),width:100,height:100),
                         ),
 
 
+                    ),
+
+                    SizedBox(height:130),
+
+                    SizedBox(height:80),
+                    SizedBox(
+                      width: 300.0,
+                      height: 60.0,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                        primary:Colors.white,
+                        shadowColor: Colors.black,
+                        elevation: 4.0,
+                        side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
                       ),
+                        child:Text("Logging in with Google",style:TextStyle(fontSize: 18,color: Colors.black)),
+                        onPressed: () {
+                          signInWithGoogle();
+                          Navigator.pop(context);
 
-                      SizedBox(height:130),
+                        },
+                      ),
+                    ),
+              SizedBox(height:20),
 
-                      SizedBox(height:80),
-                      SizedBox(
-                        width: 300.0,
-                        height: 60.0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary:Colors.white,
-                            shadowColor: Colors.black,
-                            elevation: 4.0,
-                            side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
-                          ),
-                          child:Text("Logging in with Google",style:TextStyle(fontSize: 18,color: Colors.black)),
-                          onPressed: () {
-                            signInWithGoogle();
-                            Navigator.pop(context);
-
-                          },
+              SizedBox(
+                  width: 300.0,
+                  height: 60.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary:Colors.white,
+                      shadowColor: Colors.black,
+                      elevation: 4.0,
+                      side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
                         ),
-                      ),
-                      SizedBox(height:20),
 
-                      SizedBox(
-                          width: 300.0,
-                          height: 60.0,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary:Colors.white,
-                              shadowColor: Colors.black,
-                              elevation: 4.0,
-                              side: BorderSide(color: Colors.white, width: 2.0, style: BorderStyle.solid),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
-                            ),
+                      child:Text("Logging in as a guest",style:TextStyle(fontSize: 18,color: Colors.black)),
+                      onPressed:(){
+                        FirebaseAuth.instance.signInAnonymously();
+                        Navigator.pop(context);
+                      },
+                    )
+              ),
 
-                            child:Text("Logging in as a guest",style:TextStyle(fontSize: 18,color: Colors.black)),
-                            onPressed:(){
-                              FirebaseAuth.instance.signInAnonymously();
-                              Navigator.pop(context);
-                            },
-                          )
-                      ),
-
-                    ]),
-              )),
+                  ]),
+            )),
         );
 
       case ApplicationLoginState.loggedIn:

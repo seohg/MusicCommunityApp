@@ -7,6 +7,7 @@ import 'package:modu/src/authentication.dart';
 
 import 'board.dart';
 import 'message.dart';
+import 'musichome.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   CollectionReference _collectionRef =
-  FirebaseFirestore.instance.collection('product');
+      FirebaseFirestore.instance.collection('product');
   CollectionReference _collectionRefe =
   FirebaseFirestore.instance.collection('message');
 
@@ -38,14 +39,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List> getMessageData(int num) async {
     // Get docs from collection reference
+    int counter =0;
     QuerySnapshot querySnapshot = await _collectionRefe.get();
     // Get data from docs and convert map to List
     List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     var picked;
     for(int i=0; i <allData.length; i++) {
       final temp = allData[i];
-      if (temp["receiver"].toString()==auth.currentUser!.displayName.toString())
-        picked = temp;
+      if ((temp["receiver"].toString()==auth.currentUser!.displayName.toString())&&counter==num){
+      picked = temp;
+      counter++;
+      }
     }
     List fin = [
       picked["content"].toString(),
@@ -188,12 +192,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                               style: ButtonStyle(
                                   backgroundColor:
-                                  MaterialStateProperty.all(Colors.white),
+                                      MaterialStateProperty.all(Colors.white),
                                   shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
+                                          RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
                                           borderRadius:
-                                          BorderRadius.circular(14.0),
+                                              BorderRadius.circular(14.0),
                                           side: BorderSide(
                                               color: Colors.black))))),
                         ),
@@ -204,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text(getEmail(),
                             style:
-                            TextStyle(fontSize: 12, color: Colors.white)),
+                                TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                     Row(
@@ -212,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text(getUid(),
                             style:
-                            TextStyle(fontSize: 12, color: Colors.white)),
+                                TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                     Row(
@@ -220,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text('소속그룹: Group1',
                             style:
-                            TextStyle(fontSize: 12, color: Colors.white)),
+                                TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                   ],
@@ -260,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -280,7 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -329,7 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 children: [
@@ -354,7 +358,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -374,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 children: [
@@ -399,7 +403,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -419,7 +423,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 children: [
@@ -444,7 +448,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -464,7 +468,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+                                    BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 children: [
@@ -491,7 +495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                              builder: (context) => MessagePage()));
+                          builder: (context) => MessagePage()));
                     },
                   ),
                 ],
@@ -505,6 +509,96 @@ class _MyHomePageState extends State<MyHomePage> {
                     SizedBox(width: 10),
                     FutureBuilder(
                         future: getMessageData(0),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(url.data[0]),
+                                  Text("from: " + url.data[1]),
+                                  Text(url.data[3]),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
+                    SizedBox(width: 10),
+                    FutureBuilder(
+                        future: getMessageData(1),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(url.data[0]),
+                                  Text("from: " + url.data[1]),
+                                  Text(url.data[3]),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
+                    SizedBox(width: 10),
+                    FutureBuilder(
+                        future: getMessageData(2),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -570,28 +664,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
-                    SizedBox(width: 10),
                   ],
                 ),
               ),
@@ -603,7 +675,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(width: 150),
                   IconButton(
                     icon: Icon(Icons.arrow_right_alt),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                      builder: (context) => MusicHomePage()));
+
+                    },
                   ),
                 ],
               ),

@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -62,42 +60,42 @@ class MessageWritePageState extends State<MessageWritePage> {
         child: checker ?Row(
           children: <Widget>[
             SizedBox(width: 12.0),
-            Container(
-              height: 100,
-              child:
-              Expanded(
-                child:  Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(width: 8.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            mess.content,
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                          ),
-                          Text(
-                            "From: " +mess.writer,
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "To: "+mess.receiver,
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ],
+        Container(
+                height: 100,
+                child:
+                Expanded(
+                  child:  Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(width: 8.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              mess.content,
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                            ),
+                            Text(
+                              "From: " +mess.writer,
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "To: "+mess.receiver,
+                              style: TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ) ,
-            ),
+                ) ,
+              ),
 
           ],
 
@@ -147,14 +145,15 @@ class MessageWritePageState extends State<MessageWritePage> {
                 onSubmitted: (value) {
                   messageSubmit(_messageController.text);
                   _messageController.text = "";
-                },
+                  },
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Type a message',
                 ),
               )
-          )
+    )
       ),
     );
   }
 }
+

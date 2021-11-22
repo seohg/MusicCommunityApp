@@ -25,7 +25,7 @@ class ProfilePageState extends State<ProfilePage> {
   ProfilePageState(){
     getS();
   }
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
@@ -59,14 +59,14 @@ class ProfilePageState extends State<ProfilePage> {
 
           children: [
             FirebaseAuth.instance.currentUser!.isAnonymous
-                ? Image.network('https://handong.edu/site/handong/res/img/logo.png',
-              width: 400,
-              height: 240,
-              fit: BoxFit.cover,)
-                : Image.network('${FirebaseAuth.instance.currentUser!.photoURL}',
-              width: 300,
-              height: 240,
-              fit: BoxFit.cover,),
+              ? Image.network('https://handong.edu/site/handong/res/img/logo.png',
+                            width: 400,
+                            height: 240,
+                            fit: BoxFit.cover,)
+            : Image.network('${FirebaseAuth.instance.currentUser!.photoURL}',
+                          width: 300,
+                          height: 240,
+                          fit: BoxFit.cover,),
 
             Container(
               padding: EdgeInsets.all(30),
@@ -89,90 +89,90 @@ class ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    const Divider(
-                      height: 1.0,
-                      color: Colors.black,
-                    ),
+                  const Divider(
+                    height: 1.0,
+                    color: Colors.black,
+                  ),
 
-                    Text(
+                  Text(
                       FirebaseAuth.instance.currentUser!.isAnonymous
-                          ? 'Anonymous'
-                          : '${FirebaseAuth.instance.currentUser!.email}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      ? 'Anonymous'
+                      : '${FirebaseAuth.instance.currentUser!.email}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
+                  ),
 
-                    Padding(
-                      padding: EdgeInsets.only(top: 10),
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                ),
+                if(!FirebaseAuth.instance.currentUser!.isAnonymous)
+                  Text('${FirebaseAuth.instance.currentUser!.displayName}',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    if(!FirebaseAuth.instance.currentUser!.isAnonymous)
-                      Text('${FirebaseAuth.instance.currentUser!.displayName}',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      )
-                    else
-                      Text('Anonymous',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    if ((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(!edit))
-                      TextField(
+                  )
+                else
+                  Text('Anonymous',
+                  style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  ),
+                ),
+                if ((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(!edit))
+                  TextField(
                         controller: _statusController,
                       )
-                    else if((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(edit))
-                      Text(s,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      )
-                    else
-                      Text(s,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                else if((!FirebaseAuth.instance.currentUser!.isAnonymous)&&(edit))
+                  Text(s,
+                  style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  ),
+                )
+                else
+                  Text(s,
+                    style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    ),
+                  ),
 
 
-                    if ((!FirebaseAuth.instance.currentUser!.isAnonymous))
-                      TextButton(
-                        child: Text(edit?'edit':'save', style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          setState(() {
-                            if (edit == false) {
-                              print("bye");
-                              appState.profileEdit(FirebaseAuth.instance.currentUser!.uid,_statusController.text);
-                              getS();
-                              //appState.notifyListeners();
-                              edit = true;
-                            } else {
-                              _statusController.text = s;
-                              edit = false;
-                            }
-                          });
+                if ((!FirebaseAuth.instance.currentUser!.isAnonymous))
+                  TextButton(
+                    child: Text(edit?'edit':'save', style: TextStyle(color: Colors.white)),
+                    onPressed: () {
+                      setState(() {
+                        if (edit == false) {
+                          print("bye");
+                          appState.profileEdit(FirebaseAuth.instance.currentUser!.uid,_statusController.text);
+                          getS();
+                          //appState.notifyListeners();
+                          edit = true;
+                        } else {
+                          _statusController.text = s;
+                          edit = false;
+                        }
+                      });
 
-                        },
-                      )
+                    },
+                  )
 
-                  ],
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
+      ],
       ),
+    ),
     );
   }
 }
