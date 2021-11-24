@@ -7,6 +7,7 @@ import 'package:modu/src/authentication.dart';
 
 import 'board.dart';
 import 'message.dart';
+import 'musichome.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -674,7 +675,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(width: 150),
                   IconButton(
                     icon: Icon(Icons.arrow_right_alt),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                      builder: (context) => MusicHomePage()));
+
+                    },
                   ),
                 ],
               ),

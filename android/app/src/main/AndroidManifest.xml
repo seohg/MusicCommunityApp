@@ -1,8 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.modu">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="modu"
         android:icon="@mipmap/ic_launcher">
+       android:usesCleartextTraffic="true"
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -37,5 +40,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <service
+           android:name="live.exit.musicplayer.MusicPlayerService"
+           android:enabled="true" />
     </application>
 </manifest>

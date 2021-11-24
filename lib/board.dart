@@ -5,6 +5,7 @@ import 'package:modu/profile.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'model/product.dart';
+import 'model/comment.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'main.dart';
 import 'package:provider/provider.dart';
@@ -206,7 +207,7 @@ class BoardPageState extends State<BoardPage> {
   }
 }
 
-class DetailPage extends StatefulWidget {
+class DetailPage extends StatefulWidget  {
   final Product product;
   DetailPage({Key? key, required Product this.product}) : super(key: key);
 
@@ -215,10 +216,13 @@ class DetailPage extends StatefulWidget {
 }
 class DetailPageState extends State<DetailPage> {
   late Product product;
+  late List<Comment> comments =[];
   late int price;
   late List likeList;
   late bool liked;
   late int count;
+  bool showComments = false;
+  final _commentController = TextEditingController();
 
   DetailPageState(Product product){
     this.product = product;
@@ -240,7 +244,6 @@ class DetailPageState extends State<DetailPage> {
 
           icon: const Icon(
             Icons.arrow_back,
-
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -369,7 +372,13 @@ class DetailPageState extends State<DetailPage> {
                               fontWeight: FontWeight.bold,
                               color:Colors.blue,
                             ),
-                          ),],),
+                          ),
+                              Padding(
+                                padding:EdgeInsets.only(right:50),
+                              ),
+
+                            ],
+                          ),
                         ],
                       ),
                       Padding(
@@ -409,6 +418,87 @@ class DetailPageState extends State<DetailPage> {
                           fontWeight: FontWeight.bold,
                           color:Colors.grey,
                         ),
+                      ),
+                      Row(
+                        //mainAxisAlignment: MainAxisAlignment.start,
+                        children:  <Widget>[
+                          Container(
+                            width:260,
+                            margin: EdgeInsets.all(12),
+                            child: TextField(
+                              controller: _commentController,
+                              decoration: InputDecoration(
+                                hintText: "Enter a comment",
+                                fillColor: Colors.grey[300],
+                                filled: true,
+                              ),
+                            ),
+                            ),
+
+                          IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              setState(() {
+                                  appState.commentadd(product.id,_commentController.text);
+                                  _commentController.text="";
+                              });
+                            },
+                          )
+                        ],
+                      ),
+
+                      ExpansionTile(
+                        leading: Icon(Icons.comment),
+                        title: Text("Comments"),
+                        onExpansionChanged:(bool expanded){
+                          setState(() {
+                            appState.loadComment(product.id);
+                            appState.notifyListeners();
+                            comments = appState.commentList;
+                            showComments = expanded;
+                          });
+                        },
+                          children:
+
+                          List<Widget>.generate(appState.commentList.length, (idx) {
+                            comments=[];
+                            comments = appState.commentList;
+                            return Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  Text(
+                                    comments[idx].username,
+                                    style:TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  Text(
+                                    comments[idx].time.toDate().toString(),
+                                    style:TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 10,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  Text(
+                                    comments[idx].comment,
+                                    style:TextStyle(
+                                      fontSize: 13,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+
+                                ],
+                              ),
+                            );
+                          }).toList()
+
                       ),
                     ],
                   ),

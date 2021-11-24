@@ -43,7 +43,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ListTile(
               leading: Icon(Icons.person, color: Colors.black),
               title: const Text('Profile'),
-              onTap: () {},
+              onTap: () {
+                MaterialPageRoute<void>(
+                  builder: (context) => ProfilePage(),
+                ));
+              },
             ),
             ListTile(
               leading: Icon(Icons.logout, color: Colors.black),

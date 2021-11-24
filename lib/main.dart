@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'model/mess.dart';
+import 'model/music.dart';
 import 'model/product.dart';
+import 'model/comment.dart';
 import 'src/authentication.dart';
 
 void main() {
@@ -56,6 +58,7 @@ class HomePage extends StatelessWidget {
 }
 
 class ApplicationState extends ChangeNotifier {
+  late List<Comment> commentList = [];
   ApplicationState() {
     init();
   }
@@ -111,6 +114,46 @@ class ApplicationState extends ChangeNotifier {
           }
           notifyListeners();
         });
+        _commentSubscription = FirebaseFirestore.instance
+            .collection('comment')
+            .orderBy('time', descending: false)
+            .snapshots()
+            .listen((snapshot) {
+          _commentofDoc = [];
+          for (final document in snapshot.docs) {
+            _commentofDoc.add(
+              Comment(
+                commentid: document.id,
+                docid: document.data()['docid'] as String,
+                userid: document.data()['userid'] as String,
+                username: document.data()['username'] as String,
+                time: document.data()['time'] as Timestamp,
+                comment: document.data()['comment'] as String,
+              ),
+            );
+            FirebaseFirestore.instance.collection('comment').doc(document.id).update({'id': document.id,});
+          }
+          notifyListeners();
+        });
+        _musicSubscription = FirebaseFirestore.instance
+            .collection('music')
+            .snapshots()
+            .listen((snapshot) {
+          _musicList = [];
+          for (final document in snapshot.docs) {
+            _musicList.add(
+              Music(
+                id: document.id,
+                artist: document.data()['artist'] as String,
+                imageUrl: document.data()['imageUrl'] as String,
+                songUrl: document.data()['songUrl'] as String,
+                title: document.data()['title'] as String,
+              ),
+            );
+            FirebaseFirestore.instance.collection('music').doc(document.id).update({'id': document.id,});
+          }
+          notifyListeners();
+        });
 
         // to here
       } else {
@@ -119,6 +162,10 @@ class ApplicationState extends ChangeNotifier {
         _productSubscription?.cancel();
         _messMessages=[];
         _messageSubscription?.cancel();
+        _commentofDoc=[];
+        _commentSubscription?.cancel();
+        _musicList=[];
+        _musicSubscription?.cancel();
       }
       notifyListeners();
     });
@@ -128,10 +175,16 @@ class ApplicationState extends ChangeNotifier {
   ApplicationLoginState get loginState => _loginState;
   StreamSubscription<QuerySnapshot>? _productSubscription;
   StreamSubscription<QuerySnapshot>? _messageSubscription;
+  StreamSubscription<QuerySnapshot>? _commentSubscription;
+  StreamSubscription<QuerySnapshot>? _musicSubscription;
   List<Product> _productMessages = [];
   List<Product> get productMessages => _productMessages;
   List<Mess> _messMessages = [];
   List<Mess> get messMessages => _messMessages;
+  List<Comment> _commentofDoc = [];
+  List<Comment> get commentofDoc => _commentofDoc;
+  List<Music> _musicList = [];
+  List<Music> get musicList => _musicList;
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -215,6 +268,64 @@ class ApplicationState extends ChangeNotifier {
           'status_message': status,
         });
     //notifyListeners();
+  }
+  Future<DocumentReference> commentadd(String docid,String comment) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    String writer;
+    writer = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.displayName)!;
+
+
+    return FirebaseFirestore.instance
+        .collection('comment')
+        .add(<String, dynamic>{
+      'commentid': '',
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'docid': docid,
+      'username':writer,
+      'time': FieldValue.serverTimestamp(),
+      'comment':comment,
+    });
+
+  }
+  Future<void> loadComment(String _docid) async {
+    try {
+      _commentSubscription =
+          FirebaseFirestore.instance
+              .collection('comment')
+              .where('docid', isEqualTo: _docid)
+              .orderBy('time', descending: false)
+              .snapshots()
+              .listen((snapshot) {
+            _commentofDoc = [];
+            for (final document in snapshot.docs) {
+              print(document.data()['comment']);
+              _commentofDoc.add(
+                Comment(
+                  docid: _docid,
+                  userid: document.data()['userid'] as String,
+                  commentid: document.data()['commentid'] as String,
+                  comment: document.data()['comment'] as String,
+                  username: document.data()['username'] as String,
+                  time: document.data()['time'] as Timestamp,
+                ),
+              );
+              FirebaseFirestore.instance.collection('comment')
+                  .doc(document.id)
+                  .update({'commentid': document.id,});
+            }
+            commentList = _commentofDoc;
+
+
+            notifyListeners();
+          });
+    }catch(e){
+      _commentofDoc = [];
+      commentList= [];
+
+    }
   }
 
 }
