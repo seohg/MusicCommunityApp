@@ -21,6 +21,8 @@ class MessagePage extends StatefulWidget {
 class MessagePageState extends State<MessagePage> {
   String dropdownValue = 'ASC';
   bool desc = false;
+  final _primaryController = TextEditingController();
+  final _secondaryController = TextEditingController();
 
   List<Card> _buildListCards(BuildContext context, ApplicationState appState) {
     List<Mess> messages = appState.messMessages;
@@ -160,7 +162,76 @@ class MessagePageState extends State<MessagePage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Stack(
+                    overflow: Overflow.visible,
+                    children: <Widget>[
+                      Positioned(
+                        right: -40.0,
+                        top: -40.0,
+                        child: InkResponse(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: CircleAvatar(
+                            child: Icon(Icons.close),
+                            backgroundColor: Colors.red,
+                          ),
+                        ),
+                      ),
+                      Consumer<ApplicationState>(
+                        builder: (context, appState, _) =>
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Email Address", style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),)
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: _primaryController,
+                                  ),
+                                ),
+                                Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Message Content", style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),)
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: _secondaryController,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: RaisedButton(
+                                    child: Text("Send"),
+                                    onPressed: () {
+                                      appState.newmessage(_primaryController.text,_secondaryController.text);
+                                      _primaryController.clear();
+                                      _secondaryController.clear();
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                      ),
+                    ],
+                  ),
+                );
+              });
         },
         label: const Text('Write a new message'),
         icon: const Icon(Icons.message),

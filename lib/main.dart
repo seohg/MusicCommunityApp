@@ -328,6 +328,30 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
+  Future <List> showFriends() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('friends')
+        .where(
+        "user_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    List stockpile = [];
+    for (int i = 0; i < allData.length; i++) {
+
+
+      QuerySnapshot querysec = await FirebaseFirestore.instance.collection('user')
+          .where(
+          "email", isEqualTo: allData[i]['friends'])
+          .get();
+      List halfData = querysec.docs.map((doc) => doc.data()).toList();
+      stockpile.add(halfData[0]['name'].toString());
+
+    }
+
+    //counter=stockpile.length;
+    return stockpile;
+  }
+
   Future<DocumentReference> messageadd(String message, String receiver) async {
     if (_loginState != ApplicationLoginState.loggedIn) {
       throw Exception('Must be logged in');
@@ -335,7 +359,6 @@ class ApplicationState extends ChangeNotifier {
     String writer;
     writer = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
         : FirebaseAuth.instance.currentUser!.displayName)!;
-    print("Yellow");
 
 
     return FirebaseFirestore.instance
@@ -346,6 +369,47 @@ class ApplicationState extends ChangeNotifier {
       'writer':writer,
       'created': FieldValue.serverTimestamp(),
       'content':message,
+    });
+
+  }
+
+  Future<DocumentReference> friendadd(String friend) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    String email;
+    email = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.email)!;
+
+    return FirebaseFirestore.instance
+        .collection('friends')
+        .add(<String, dynamic>{
+      'friends': friend,
+      'user_email':email,
+    });
+
+  }
+
+  Future<DocumentReference> newmessage(String recepient, String content) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('user')
+        .where(
+        "email", isEqualTo: recepient.toString())
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    return FirebaseFirestore.instance
+        .collection('message')
+        .add(<String, dynamic>{
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'receiver': allData[0]['name'],
+      'writer':FirebaseAuth.instance.currentUser!.displayName,
+      'created': FieldValue.serverTimestamp(),
+      'content':content,
+
     });
 
   }

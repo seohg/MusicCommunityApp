@@ -1,14 +1,25 @@
+import 'dart:core';
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modu/src/authentication.dart';
 import 'main.dart';
 import 'package:provider/provider.dart';
+
 class FriendsPage extends StatefulWidget {
   @override
   FriendsPageState createState() => FriendsPageState();
 }
+
 class FriendsPageState extends State<FriendsPage> {
+
+  final _friendsController = TextEditingController();
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +39,134 @@ class FriendsPageState extends State<FriendsPage> {
         ),
 
         actions: <Widget>[
-          Consumer<ApplicationState>(
-            builder: (context, appState, _) =>
-                Row(
-                  children: [
-
-                  ],
-                ),
-          ),
         ],
 
 
       ),
 
+    body: Center(
+        child: Column(
+          children: [
+        Consumer<ApplicationState>(
+        builder: (context, appState, _) =>
+            FutureBuilder(
+                future: appState.showFriends(),
+                builder: (BuildContext context, AsyncSnapshot url) {
+                  if (url.hasData == false) {
+                    return Container(
+                      width: 115.0,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        border: Border.all(
+                          color: Colors.white,
+                        ),
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(10)),
+                      ),
+                    );
+                  } else if (url.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Error: ${url.error}',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    );
+                  } else {
+                    return Column(
+                        children: [
+                          SizedBox(height:10),
+
+                          for (var i = 0; i < url.data.length; i++) Container(
+                          width: 205.0,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            border: Border.all(
+                              color: Colors.white,
+                            ),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(height:15),
+                              Text(url.data[i],
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                              SizedBox(height:15),
+                            ],
+                          ),
+                        ) ]
+                  );
+                  }
+                }
+            ),
+        )],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Stack(
+                    overflow: Overflow.visible,
+                    children: <Widget>[
+                      Positioned(
+                        right: -40.0,
+                        top: -40.0,
+                        child: InkResponse(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: CircleAvatar(
+                            child: Icon(Icons.close),
+                            backgroundColor: Colors.red,
+                          ),
+                        ),
+                      ),
+                      Consumer<ApplicationState>(
+                        builder: (context, appState, _) =>
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Add with email", style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),)
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: _friendsController,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: RaisedButton(
+                                    child: Text("Add"),
+                                    onPressed: () {
+                                      appState.friendadd(_friendsController.text);
+                                      _friendsController.text = "";
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
+        label: const Text('Add a new friend'),
+        icon: const Icon(Icons.add),
+        backgroundColor: Colors.black,
+      ),
     );
   }
 }

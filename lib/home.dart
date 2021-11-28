@@ -45,31 +45,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List> getMessageData(int num) async {
 
-
-    //QuerySnapshot querySnapshot = await _collectionRefe.get();
-    //List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-
     QuerySnapshot quer = await FirebaseFirestore.instance.collection('message').where("receiver", isEqualTo: auth.currentUser!.displayName.toString()).get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
     allData = allData.reversed.toList();
 
 
     var picked=allData[num];
-    //int counter =0;
-
-   /* for(int i=0; i <allData.length; i++) {
-      dynamic temp = allData[i];
-      if ((temp["receiver"].toString()==auth.currentUser!.displayName.toString())){
-        if (counter==num) {
-        picked = temp;
-        }
-        else
-        counter++;
-        }
-    }*/
     DateTime tim= DateTime.fromMicrosecondsSinceEpoch(picked["created"].microsecondsSinceEpoch);
     String formattedtim= DateFormat('MM/dd  (kk:mm)').format(tim);
-    print(allData.length);
     if (num>allData.length) {
       return ['','',''];
     }
