@@ -32,10 +32,10 @@ class MessagePageState extends State<MessagePage> {
 
     final FirebaseAuth auth = FirebaseAuth.instance;
     final ThemeData theme = Theme.of(context);
+    List<String> redundant=[''];
 
     return messages.map((mess) {
       String temp;
-      List<String> redundant=[''];
       bool redun=true;
       if((mess.writer.toString()==auth.currentUser!.displayName.toString())&&(mess.receiver.toString()!=auth.currentUser!.displayName.toString())) {
         temp = mess.receiver;
@@ -51,6 +51,7 @@ class MessagePageState extends State<MessagePage> {
       }
        else if ((mess.writer.toString()!=auth.currentUser!.displayName.toString())&&(mess.receiver.toString()==auth.currentUser!.displayName.toString())) {
         temp = mess.writer;
+
         for(int i=0;i<redundant.length;i++) {
           if(redundant[i]==temp) {
             redun=false;
@@ -66,9 +67,9 @@ class MessagePageState extends State<MessagePage> {
         else
         temp="";
       if(redun==true)
-      redundant.add(temp);
+        redundant.add(temp);
 
-        bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+      bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
 
       bool checker= achecker && redun;
 
@@ -98,21 +99,11 @@ class MessagePageState extends State<MessagePage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
+                            SizedBox(height:20),
                             Text(
-                              mess.content,
+                              mess.receiver,
                               style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
-                              maxLines: 1,
-                            ),
-                            Text(
-                              "From: " +mess.writer,
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "To: "+mess.receiver,
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),

@@ -6,6 +6,7 @@ import 'board.dart';
 import 'main.dart';
 import 'model/mess.dart';
 import 'model/product.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -52,16 +53,22 @@ class MessageWritePageState extends State<MessageWritePage> {
     final ThemeData theme = Theme.of(context);
 
     return messages.map((mess) {
-      bool checker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+      bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+      bool bchecker=((mess.receiver.toString()==title)||(mess.writer.toString()==title));
+      bool checker=achecker&&bchecker;
+      bool color=mess.writer!=auth.currentUser!.displayName.toString();
       print(mess.receiver.toString());
       return Card(
         clipBehavior: Clip.antiAlias,
         elevation: 5,
-        child: checker ?Row(
+        child: checker ? Row(
+
           children: <Widget>[
-            SizedBox(width: 12.0),
+            //SizedBox(width: 12.0,),
         Container(
                 height: 100,
+          width:387,
+          color: color? Colors.grey[350] : Colors.white,
                 child:
                 Expanded(
                   child:  Padding(
@@ -133,7 +140,9 @@ class MessageWritePageState extends State<MessageWritePage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: Consumer<ApplicationState>(
+          builder: (context, appState, _) =>Container(
+
           padding: MediaQuery.of(context).viewInsets,
           color: Colors.grey[300],
           child: Container(
@@ -143,7 +152,8 @@ class MessageWritePageState extends State<MessageWritePage> {
                 controller: _messageController,
                 textInputAction: TextInputAction.go,
                 onSubmitted: (value) {
-                  messageSubmit(_messageController.text);
+                  //messageSubmit(_messageController.text);
+                  appState.messageadd(_messageController.text,title);
                   _messageController.text = "";
                   },
                 decoration: InputDecoration(
@@ -152,7 +162,10 @@ class MessageWritePageState extends State<MessageWritePage> {
                 ),
               )
     )
-      ),
+
+
+    )
+      )
     );
   }
 }

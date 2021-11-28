@@ -328,6 +328,28 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
+  Future<DocumentReference> messageadd(String message, String receiver) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    String writer;
+    writer = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.displayName)!;
+    print("Yellow");
+
+
+    return FirebaseFirestore.instance
+        .collection('message')
+        .add(<String, dynamic>{
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'receiver': receiver,
+      'writer':writer,
+      'created': FieldValue.serverTimestamp(),
+      'content':message,
+    });
+
+  }
+
 }
 
 
