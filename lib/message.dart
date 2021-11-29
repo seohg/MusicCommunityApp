@@ -11,112 +11,131 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'main.dart';
 import 'package:provider/provider.dart';
 
-
-
 class MessagePage extends StatefulWidget {
   MessagePage({Key? key}) : super(key: key);
+
   @override
-  MessagePageState createState()=>MessagePageState();
+  MessagePageState createState() => MessagePageState();
 }
+
 class MessagePageState extends State<MessagePage> {
   String dropdownValue = 'ASC';
   bool desc = false;
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<bool> friendchecker(String friend) async {
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('friends')
+        .where("user_id", isEqualTo: auth.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    bool checker = false;
+    for (int i = 0; i < allData.length; i++) {
+      print(friend);
+      print(allData[0]["friends"]);
+      if (friend == allData[0]["friends"].toString()) {
+        checker = true;
+      }
+    }
+    print("hello");
+    return checker;
+  }
+
   final _primaryController = TextEditingController();
   final _secondaryController = TextEditingController();
 
   List<Card> _buildListCards(BuildContext context, ApplicationState appState) {
     List<Mess> messages = appState.messMessages;
 
-
     if (messages == null || messages.isEmpty) {
       return const <Card>[];
     }
 
-    final FirebaseAuth auth = FirebaseAuth.instance;
     final ThemeData theme = Theme.of(context);
-    List<String> redundant=[''];
+    List<String> redundant = [''];
 
     return messages.map((mess) {
       String temp;
-      bool redun=true;
-      if((mess.writer.toString()==auth.currentUser!.displayName.toString())&&(mess.receiver.toString()!=auth.currentUser!.displayName.toString())) {
+      bool redun = true;
+      if ((mess.writer.toString() == auth.currentUser!.displayName.toString()) &&
+          (mess.receiver.toString() != auth.currentUser!.displayName.toString())) {
         temp = mess.receiver;
-        for(int i=0;i<redundant.length;i++) {
-          if(redundant[i]==temp) {
+        for (int i = 0; i < redundant.length; i++) {
+          if (redundant[i] == temp) {
             redun = false;
             break;
-          }
-          else if(redundant[i]!=temp){
+          } else if (redundant[i] != temp) {
             redun = true;
           }
         }
-      }
-       else if ((mess.writer.toString()!=auth.currentUser!.displayName.toString())&&(mess.receiver.toString()==auth.currentUser!.displayName.toString())) {
+      } else if ((mess.writer.toString() != auth.currentUser!.displayName.toString()) &&
+          (mess.receiver.toString() == auth.currentUser!.displayName.toString())) {
         temp = mess.writer;
 
-        for(int i=0;i<redundant.length;i++) {
-          if(redundant[i]==temp) {
-            redun=false;
+        for (int i = 0; i < redundant.length; i++) {
+          if (redundant[i] == temp) {
+            redun = false;
             break;
-          }
-          else if (redundant[i]!=temp){
+          } else if (redundant[i] != temp) {
             redundant.add(temp);
-
-            redun=true;
+            redun = true;
           }
         }
-      }
-        else
-        temp="";
-      if(redun==true)
-        redundant.add(temp);
+      } else
+        temp = "";
+      if (redun == true) redundant.add(temp);
 
-      bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
+      bool achecker = ((mess.receiver.toString() == auth.currentUser!.displayName.toString()) ||
+          (mess.writer.toString() == auth.currentUser!.displayName.toString()));
 
-      bool checker= achecker && redun;
-
+      bool checker = achecker && redun;
 
       return Card(
         clipBehavior: Clip.antiAlias,
         elevation: 5,
-        child: checker ?Row(
-          children: <Widget>[
-            SizedBox(width: 12.0),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(builder: (context)=>MessageWritePage(message: mess, title: temp)));
-              },
-              child: Container(
-                height: 100,
-                child:
-                Expanded(
-                  child:  Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(width: 8.0),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(height:20),
-                            Text(
-                              mess.receiver,
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+        child: checker
+            ? Row(
+                children: <Widget>[
+                  SizedBox(width: 12.0),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                              builder: (context) => MessageWritePage(
+                                  message: mess, title: temp)));
+                    },
+                    child: Container(
+                      height: 100,
+                      child: Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10, top: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              SizedBox(width: 8.0),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  SizedBox(height: 20),
+                                  Text(
+                                    mess.receiver,
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ) ,
-              ),
-            ),
-          ],
-        ) :null,
+                ],
+              )
+            : null,
       );
     }).toList();
   }
@@ -130,28 +149,24 @@ class MessagePageState extends State<MessagePage> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-          ), onPressed: () {
-          Navigator.pop(context);
-        },
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        title: Text('메시지',
-            textAlign: TextAlign.center),
-
-        actions: <Widget>[
-        ],
+        title: Text('메시지', textAlign: TextAlign.center),
+        actions: <Widget>[],
       ),
-
       body: Center(
         child: Consumer<ApplicationState>(
           builder: (context, appState, _) => Column(
-            children:<Widget>[
+            children: <Widget>[
               Expanded(
                 child: OrientationBuilder(
-                  builder: (context,orientation){
-                    return
-                    ListView(
+                  builder: (context, orientation) {
+                    return ListView(
                       padding: const EdgeInsets.all(8),
-                      children: _buildListCards(context,appState),
+                      children: _buildListCards(context, appState),
                     );
                   },
                 ),
@@ -183,37 +198,38 @@ class MessagePageState extends State<MessagePage> {
                         ),
                       ),
                       Consumer<ApplicationState>(
-                        builder: (context, appState, _) =>
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "Email Address", style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),)
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: _primaryController,
-                                  ),
-                                ),
-                                Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "Message Content", style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),)
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: _secondaryController,
-                                  ),
-                                ),
-                                Padding(
+                        builder: (context, appState, _) => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Email Address",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _primaryController,
+                              ),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Message Content",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: _secondaryController,
+                              ),
+                            ),
+                                    Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: RaisedButton(
                                     child: Text("Send"),
@@ -225,8 +241,10 @@ class MessagePageState extends State<MessagePage> {
                                     },
                                   ),
                                 )
-                              ],
-                            ),
+
+
+                          ],
+                        ),
                       ),
                     ],
                   ),

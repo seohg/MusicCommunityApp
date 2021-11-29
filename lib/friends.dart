@@ -16,6 +16,7 @@ class FriendsPage extends StatefulWidget {
 class FriendsPageState extends State<FriendsPage> {
 
   final _friendsController = TextEditingController();
+  int temp=0;
 
   final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -78,7 +79,8 @@ class FriendsPageState extends State<FriendsPage> {
                           SizedBox(height:10),
 
                           for (var i = 0; i < url.data.length; i++) Container(
-                          width: 205.0,
+                          width: 400.0,
+                          margin: EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             color: Colors.grey[300],
                             border: Border.all(
@@ -91,12 +93,15 @@ class FriendsPageState extends State<FriendsPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(height:15),
+                              Text(temp.toString(),
+                                style: TextStyle(fontSize: 1, color: Colors.grey[300])),
                               Text(url.data[i],
                                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
                               SizedBox(height:15),
                             ],
                           ),
-                        ) ]
+                        )
+                        ]
                   );
                   }
                 }
@@ -151,6 +156,9 @@ class FriendsPageState extends State<FriendsPage> {
                                     onPressed: () {
                                       appState.friendadd(_friendsController.text);
                                       _friendsController.text = "";
+                                      setState(() {
+                                        temp++;
+                                      });
                                       Navigator.pop(context);
                                     },
                                   ),

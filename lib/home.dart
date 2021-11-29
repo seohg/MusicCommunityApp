@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     QuerySnapshot quer = await FirebaseFirestore.instance.collection('message').where("receiver", isEqualTo: auth.currentUser!.displayName.toString()).get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
-    allData = allData.reversed.toList();
+    allData = allData.toList();
 
 
     var picked=allData[num];
@@ -598,7 +598,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             );
                           }
-                        }),
+                        }
+                        ),
                     SizedBox(width: 10),
                   ],
                 ),
