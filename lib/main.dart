@@ -348,8 +348,27 @@ class ApplicationState extends ChangeNotifier {
 
     }
 
-    //counter=stockpile.length;
     return stockpile;
+  }
+
+  Future <List> showGroup() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('group')
+        .where(
+        "user_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    return allData;
+  }
+
+  Future <List> showNotification() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('notification')
+        .where(
+        "receiver_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    return allData;
   }
 
   Future<DocumentReference> messageadd(String message, String receiver) async {
@@ -391,16 +410,41 @@ class ApplicationState extends ChangeNotifier {
 
   }
 
+  Future<List> friendlist() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('friends')
+        .where("user_email", isEqualTo: auth.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    List friends = ["<FRIENDS LIST>"];
+    for (int i = 0; i < allData.length; i++) {
+      QuerySnapshot quer = await FirebaseFirestore.instance
+          .collection('user')
+          .where("email", isEqualTo: allData[i]["friends"])
+          .get();
+      List halfData = quer.docs.map((doc) => doc.data()).toList();
+      for (int i = 0; i < halfData.length; i++) {
+        friends.add(halfData[i]["name"].toString());
+      }
+    }
+    return friends;
+  }
+
+
   Future<DocumentReference> newmessage(String recepient, String content) async {
     if (_loginState != ApplicationLoginState.loggedIn) {
       throw Exception('Must be logged in');
     }
-
     QuerySnapshot query = await FirebaseFirestore.instance.collection('user')
         .where(
-        "email", isEqualTo: recepient.toString())
+        "name", isEqualTo: recepient.toString())
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
+    print("good");
+    print(recepient);
+    print(allData[0]['name']);
+    print(content);
 
     return FirebaseFirestore.instance
         .collection('message')
@@ -412,6 +456,7 @@ class ApplicationState extends ChangeNotifier {
       'content':content,
 
     });
+
 
   }
 

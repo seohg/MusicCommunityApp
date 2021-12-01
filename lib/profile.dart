@@ -5,6 +5,7 @@ import 'package:modu/src/authentication.dart';
 import 'main.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -12,6 +13,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class ProfilePageState extends State<ProfilePage> {
+
+
+
+
   late bool edit = true;
   final _statusController = TextEditingController();
 
@@ -32,6 +37,7 @@ class ProfilePageState extends State<ProfilePage> {
   ProfilePageState() {
     getS();
   }
+
 
   @override
   Widget build(BuildContext context) {

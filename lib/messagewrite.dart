@@ -13,10 +13,13 @@ import 'package:image_picker/image_picker.dart';
 class MessageWritePage extends StatefulWidget {
   final Mess message;
   final String title;
-  MessageWritePage({Key? key, required this.message, required this.title}) : super(key: key);
+
+  MessageWritePage({Key? key, required this.message, required this.title})
+      : super(key: key);
 
   @override
-  MessageWritePageState createState() => MessageWritePageState(this.message, this.title);
+  MessageWritePageState createState() =>
+      MessageWritePageState(this.message, this.title);
 }
 
 class MessageWritePageState extends State<MessageWritePage> {
@@ -26,147 +29,152 @@ class MessageWritePageState extends State<MessageWritePage> {
   late bool liked;
   late int count;
 
-  MessageWritePageState(Mess message, String title){
+  MessageWritePageState(Mess message, String title) {
     this.message = message;
     this.title = title;
   }
+
   final _messageController = TextEditingController();
 
   messageSubmit(String message) {
-    CollectionReference messages = FirebaseFirestore.instance.collection('message');
+    CollectionReference messages =
+        FirebaseFirestore.instance.collection('message');
     FirebaseAuth auth = FirebaseAuth.instance;
-    messages.add({'id': auth.currentUser!.uid.toString(),'content': message, 'writer': auth.currentUser!.displayName.toString(), 'receiver': title, 'created': Timestamp.fromDate(DateTime.now()).toString()});
+    messages.add({
+      'id': auth.currentUser!.uid.toString(),
+      'content': message,
+      'writer': auth.currentUser!.displayName.toString(),
+      'receiver': title,
+      'created': Timestamp.fromDate(DateTime.now()).toString()
+    });
 
     return;
   }
 
-
   List<Card> _buildListCards(BuildContext context, ApplicationState appState) {
     List<Mess> messages = appState.messMessages;
-
+    List<Mess> newmess = [];
+    final FirebaseAuth auth = FirebaseAuth.instance;
 
     if (messages == null || messages.isEmpty) {
       return const <Card>[];
     }
+    for(int i=0; i< messages.length; i++) {
+      bool achecker = ((messages[i].receiver.toString() ==
+          auth.currentUser!.displayName.toString()) ||
+          (messages[i].writer.toString() == auth.currentUser!.displayName.toString()));
+      bool bchecker = ((messages[i].receiver.toString() == title) ||
+          (messages[i].writer.toString() == title));
+      if(achecker && bchecker) {
+        newmess.add(messages[i]);
 
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final ThemeData theme = Theme.of(context);
+      }
+    }
 
-    return messages.map((mess) {
-      bool achecker=((mess.receiver.toString()==auth.currentUser!.displayName.toString())||(mess.writer.toString()==auth.currentUser!.displayName.toString()));
-      bool bchecker=((mess.receiver.toString()==title)||(mess.writer.toString()==title));
-      bool checker=achecker&&bchecker;
-      bool color=mess.writer!=auth.currentUser!.displayName.toString();
-      print(mess.receiver.toString());
+    return newmess.map((mess) {
+      bool color = mess.writer != auth.currentUser!.displayName.toString();
       return Card(
         clipBehavior: Clip.antiAlias,
         elevation: 5,
-        child: checker ? Row(
-
-          children: <Widget>[
-            //SizedBox(width: 12.0,),
-        Container(
-                height: 100,
-          width:387,
-          color: color? Colors.grey[350] : Colors.white,
-                child:
-                Expanded(
-                  child:  Padding(
-                    padding: const EdgeInsets.only(left: 10, top: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(width: 8.0),
-                        Column(
+        color: color ? Colors.grey[350] : Colors.white,
+        child: /*checker ?*/ Row(
+                children: <Widget>[
+                  Container(
+                    height: 100,
+                    color: color ? Colors.grey[350] : Colors.white,
+                    child: Expanded(
+                      flex: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 5, top: 5),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              mess.content,
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
-                              maxLines: 1,
-                            ),
-                            Text(
-                              "From: " +mess.writer,
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              "To: "+mess.receiver,
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
+                            SizedBox(width: 8.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                    mess.content,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                Text(
+                                  "From: " + mess.writer,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "To: " + mess.receiver,
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ) ,
-              ),
-
-          ],
-
-        ) :null,
+                ],
+              )
+            //: null,
       );
     }).toList();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        title: Text(title,textAlign: TextAlign.center),
-        actions: <Widget>[
-        ],
-      ),
-      body: Center(
-        child: Consumer<ApplicationState>(
-          builder: (context, appState, _) => Column(
-            children:<Widget>[
-              Expanded(
-                child: OrientationBuilder(
-                  builder: (context,orientation){
-                    return
-                      ListView(
+        //key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          centerTitle: true,
+          title: Text(title, textAlign: TextAlign.center),
+          actions: <Widget>[],
+        ),
+        body: Center(
+          child: Consumer<ApplicationState>(
+            builder: (context, appState, _) => Column(
+              children: <Widget>[
+                Expanded(
+                  child: OrientationBuilder(
+                    builder: (context, orientation) {
+                      return ListView(
                         padding: const EdgeInsets.all(8),
-                        children: _buildListCards(context,appState),
+                        children: _buildListCards(context, appState),
                       );
-                  },
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: Consumer<ApplicationState>(
-          builder: (context, appState, _) =>Container(
-
-          padding: MediaQuery.of(context).viewInsets,
-          color: Colors.grey[300],
-          child: Container(
-              padding: EdgeInsets.symmetric(vertical: 2),
-              margin: EdgeInsets.symmetric(horizontal: 5),
-              child: TextField(
-                controller: _messageController,
-                textInputAction: TextInputAction.go,
-                onSubmitted: (value) {
-                  //messageSubmit(_messageController.text);
-                  appState.messageadd(_messageController.text,title);
-                  _messageController.text = "";
-                  },
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Type a message',
-                ),
-              )
-    )
-
-
-    )
-      )
-    );
+        bottomNavigationBar: Consumer<ApplicationState>(
+            builder: (context, appState, _) => Container(
+                padding: MediaQuery.of(context).viewInsets,
+                color: Colors.grey[300],
+                child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 2),
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    child: TextField(
+                      controller: _messageController,
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (value) {
+                        //messageSubmit(_messageController.text);
+                        appState.messageadd(_messageController.text, title);
+                        _messageController.text = "";
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Type a message',
+                      ),
+                    )))));
   }
 }
-

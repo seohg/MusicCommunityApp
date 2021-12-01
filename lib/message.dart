@@ -19,83 +19,109 @@ class MessagePage extends StatefulWidget {
 }
 
 class MessagePageState extends State<MessagePage> {
-  String dropdownValue = 'ASC';
-  bool desc = false;
-
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<bool> friendchecker(String friend) async {
+  Future <String> friendfind() async {
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection('friends')
-        .where("user_id", isEqualTo: auth.currentUser!.email)
+        .where("user_email", isEqualTo: auth.currentUser!.email)
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
-    bool checker = false;
+    String friend="";
+    List halfData =[];
     for (int i = 0; i < allData.length; i++) {
-      print(friend);
-      print(allData[0]["friends"]);
-      if (friend == allData[0]["friends"].toString()) {
-        checker = true;
-      }
+      QuerySnapshot quer = await FirebaseFirestore.instance
+          .collection('user')
+          .where("email", isEqualTo: allData[i]["friends"])
+          .get();
+      halfData = quer.docs.map((doc) => doc.data()).toList();
     }
-    print("hello");
-    return checker;
+    return friend=halfData[0]["name"];
   }
 
-  final _primaryController = TextEditingController();
+
+  Future<List> friendlist() async {
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('friends')
+        .where("user_email", isEqualTo: auth.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    List friends = ["<FRIENDS LIST>"];
+    for (int i = 0; i < allData.length; i++) {
+      QuerySnapshot quer = await FirebaseFirestore.instance
+          .collection('user')
+          .where("email", isEqualTo: allData[i]["friends"])
+          .get();
+      List halfData = quer.docs.map((doc) => doc.data()).toList();
+      for (int i = 0; i < halfData.length; i++) {
+        friends.add(halfData[i]["name"].toString());
+      }
+    }
+    return friends;
+  }
+
   final _secondaryController = TextEditingController();
+
+  String dropdownValue = 'Friends';
 
   List<Card> _buildListCards(BuildContext context, ApplicationState appState) {
     List<Mess> messages = appState.messMessages;
+    List<Mess> newmess =[];
+    List<String> redundant=[];
+    String temp ='';
+    bool redun=false;
 
     if (messages == null || messages.isEmpty) {
       return const <Card>[];
     }
 
-    final ThemeData theme = Theme.of(context);
-    List<String> redundant = [''];
+    for(int i=0; i< messages.length; i++) {
 
-    return messages.map((mess) {
-      String temp;
-      bool redun = true;
-      if ((mess.writer.toString() == auth.currentUser!.displayName.toString()) &&
-          (mess.receiver.toString() != auth.currentUser!.displayName.toString())) {
-        temp = mess.receiver;
-        for (int i = 0; i < redundant.length; i++) {
-          if (redundant[i] == temp) {
-            redun = false;
-            break;
-          } else if (redundant[i] != temp) {
-            redun = true;
-          }
+
+      if((messages[i].receiver.toString() ==
+          auth.currentUser!.displayName.toString()) &&
+          (messages[i].writer.toString() != auth.currentUser!.displayName.toString())) {
+        temp=messages[i].writer;
+      }
+      else if((messages[i].receiver.toString() !=
+          auth.currentUser!.displayName.toString()) &&
+          (messages[i].writer.toString() == auth.currentUser!.displayName.toString())) {
+        temp=messages[i].receiver;
+
+      }
+      for(int i=0; i<redundant.length;i++) {
+        if(redundant[i]==temp) {
+          redun=true;
+          break;
+        }else if (redundant[i]!=temp) {
+          redun=false;
         }
-      } else if ((mess.writer.toString() != auth.currentUser!.displayName.toString()) &&
-          (mess.receiver.toString() == auth.currentUser!.displayName.toString())) {
-        temp = mess.writer;
-
-        for (int i = 0; i < redundant.length; i++) {
-          if (redundant[i] == temp) {
-            redun = false;
-            break;
-          } else if (redundant[i] != temp) {
-            redundant.add(temp);
-            redun = true;
-          }
+      }
+      if(redun==false) {
+        redundant.add(temp);
+        if(temp!="") {
+          newmess.add(messages[i]);
         }
-      } else
-        temp = "";
-      if (redun == true) redundant.add(temp);
+      }
 
-      bool achecker = ((mess.receiver.toString() == auth.currentUser!.displayName.toString()) ||
-          (mess.writer.toString() == auth.currentUser!.displayName.toString()));
 
-      bool checker = achecker && redun;
+    }
 
+
+
+
+
+    return newmess.map((mess) {
+      String name='';
+      if(mess.receiver==auth.currentUser!.displayName.toString()) {
+        name=mess.writer;
+      } else if (mess.writer==auth.currentUser!.displayName.toString()) {
+        name=mess.receiver;
+      }
       return Card(
         clipBehavior: Clip.antiAlias,
         elevation: 5,
-        child: checker
-            ? Row(
+        child: Row(
                 children: <Widget>[
                   SizedBox(width: 12.0),
                   GestureDetector(
@@ -104,7 +130,7 @@ class MessagePageState extends State<MessagePage> {
                           context,
                           MaterialPageRoute<void>(
                               builder: (context) => MessageWritePage(
-                                  message: mess, title: temp)));
+                                  message: mess, title: name)));
                     },
                     child: Container(
                       height: 100,
@@ -120,7 +146,7 @@ class MessagePageState extends State<MessagePage> {
                                 children: <Widget>[
                                   SizedBox(height: 20),
                                   Text(
-                                    mess.receiver,
+                                    name,
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
@@ -135,10 +161,12 @@ class MessagePageState extends State<MessagePage> {
                   ),
                 ],
               )
-            : null,
+
       );
     }).toList();
   }
+
+  ValueNotifier<String> va=ValueNotifier<String>("<FRIENDS LIST>");
 
   @override
   Widget build(BuildContext context) {
@@ -204,17 +232,66 @@ class MessagePageState extends State<MessagePage> {
                             Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Text(
-                                  "Email Address",
+                                  "Recepient",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 )),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _primaryController,
-                              ),
+                            FutureBuilder(
+                                future: appState.friendlist(),
+                                builder: (BuildContext context, AsyncSnapshot url) {
+                                  if (url.hasData == false) {
+                                    return Container(
+                                      alignment:Alignment.center,
+                                      width: 150,
+                                      height: 48,
+                                      child: Text("Bringing Friends...")
+                                    );
+                                  } else if (url.hasError) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Error: ${url.error}',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    );
+                                  } else {
+                                    return
+                                      ValueListenableBuilder<String>(
+                                        builder: (BuildContext context, String vals, Widget? child) {
+                                          return DropdownButton<String>(
+                                            value: vals,
+                                            icon: const Icon(Icons.arrow_drop_down_sharp),
+                                            iconSize: 24,
+                                            elevation: 16,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                            underline: Container(
+                                              height: 2,
+                                              color: Colors.black,
+                                            ),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                va.value = newValue!;
+
+                                              });
+                                            },
+                                            items: url.data.map<DropdownMenuItem<String>>((value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+
+                                          );
+                                        },
+                                        valueListenable: va,
+                                      );
+                                  }
+                                }
                             ),
+
                             Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Text(
@@ -225,24 +302,25 @@ class MessagePageState extends State<MessagePage> {
                                 )),
                             Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: _secondaryController,
+
+
+                                child:TextFormField(
+                                  controller: _secondaryController,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
                               ),
                             ),
-                                    Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RaisedButton(
-                                    child: Text("Send"),
-                                    onPressed: () {
-                                      appState.newmessage(_primaryController.text,_secondaryController.text);
-                                      _primaryController.clear();
-                                      _secondaryController.clear();
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                )
-
-
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: RaisedButton(
+                                child: Text("Send"),
+                                onPressed: () {
+                                  appState.newmessage(va.value, _secondaryController.text);
+                                  _secondaryController.clear();
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            )
                           ],
                         ),
                       ),

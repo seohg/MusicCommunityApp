@@ -55,16 +55,19 @@ class FriendsPageState extends State<FriendsPage> {
                 builder: (BuildContext context, AsyncSnapshot url) {
                   if (url.hasData == false) {
                     return Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
+                      alignment: Alignment.center,
+                        width: 400.0,
+                        height: 400,
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          border: Border.all(
+                            color: Colors.white,
+                          ),
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(10)),
                         ),
-                        borderRadius:
-                        BorderRadius.all(Radius.circular(10)),
-                      ),
-                    );
+                    child: Text("BRINGING LIST OF FRIENDS!!",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
                   } else if (url.hasError) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),

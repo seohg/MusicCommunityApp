@@ -10,10 +10,12 @@ import 'package:intl/intl.dart';
 
 import 'board.dart';
 import 'friends.dart';
+import 'group.dart';
 import 'main.dart';
 import 'message.dart';
 import 'model/music.dart';
 import 'musichome.dart';
+import 'notification.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -24,7 +26,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   CollectionReference _collectionRef = FirebaseFirestore.instance.collection('product');
-  CollectionReference _collectionRefe = FirebaseFirestore.instance.collection('message');
 
 
   Future<List> getBoardData(int num) async {
@@ -42,12 +43,23 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return fin;
   }
+  Future<String> getGroupName() async {
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String grpname= allData[0]['group_name'];
+    return grpname;
+  }
+  Future<String> getInstrument() async {
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String ins= allData[0]['instrument'];
+    return ins;
+  }
 
   Future<List> getMessageData(int num) async {
 
     QuerySnapshot quer = await FirebaseFirestore.instance.collection('message').where("receiver", isEqualTo: auth.currentUser!.displayName.toString()).get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
-    allData = allData.toList();
 
 
     var picked=allData[num];
@@ -146,6 +158,14 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.contacts, color: Colors.black),
+              title: const Text('Group'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => GroupPage()));
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: Colors.black),
               title: const Text('Log Out'),
               onTap: () {
@@ -168,7 +188,10 @@ class _MyHomePageState extends State<MyHomePage> {
               Icons.notifications_outlined,
               semanticLabel: 'bell',
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()));
+            },
           ),
         ],
       ),
@@ -247,17 +270,60 @@ class _MyHomePageState extends State<MyHomePage> {
                     Row(
                       children: [
                         SizedBox(width: 20),
-                        Text(getUid(),
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                        FutureBuilder(
+                            future: getInstrument(),
+                            builder: (BuildContext context, AsyncSnapshot url) {
+                              if (url.hasData == false) {
+                                return Container(
+                                  width: 115.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else if (url.hasError) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Error: ${url.error}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              } else {
+                                return Text("악기: " +url.data,
+                                    style:
+                                    TextStyle(fontSize: 12, color: Colors.white));
+                              }
+                            }),
                       ],
                     ),
                     Row(
                       children: [
                         SizedBox(width: 20),
-                        Text('소속그룹: Group1',
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                        FutureBuilder(
+                            future: getGroupName(),
+                            builder: (BuildContext context, AsyncSnapshot url) {
+                              if (url.hasData == false) {
+                                return Container(
+                                  width: 115.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else if (url.hasError) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Error: ${url.error}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              } else {
+                                return Text("소속그룹: " +url.data,
+                                    style:
+                                    TextStyle(fontSize: 12, color: Colors.white));
+                              }
+                            }),
+
                       ],
                     ),
                   ],
