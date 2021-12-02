@@ -10,6 +10,7 @@ import 'model/music.dart';
 import 'model/product.dart';
 import 'model/comment.dart';
 import 'src/authentication.dart';
+import 'package:location/location.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -59,10 +60,13 @@ class HomePage extends StatelessWidget {
 
 class ApplicationState extends ChangeNotifier {
   late List<Comment> commentList = [];
+  Location location = new Location();
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
+
   ApplicationState() {
     init();
   }
-
   Future<void> init() async {
     await Firebase.initializeApp();
     FirebaseAuth.instance.userChanges().listen((user) {
@@ -222,11 +226,11 @@ class ApplicationState extends ChangeNotifier {
         .collection('product')
         .doc(id)
         .update({
-          'title': name,
-          'contents': description,
-          'update': FieldValue.serverTimestamp(),
-          'UID':FirebaseAuth.instance.currentUser!.uid,
-        });
+      'title': name,
+      'contents': description,
+      'update': FieldValue.serverTimestamp(),
+      'UID':FirebaseAuth.instance.currentUser!.uid,
+    });
     notifyListeners();
   }
   Future<void> sort(bool desc) async {
@@ -265,8 +269,8 @@ class ApplicationState extends ChangeNotifier {
         .collection('user')
         .doc(id)
         .update({
-          'status_message': status,
-        });
+      'status_message': status,
+    });
     //notifyListeners();
   }
   Future<DocumentReference> commentadd(String docid,String comment) async {
@@ -328,7 +332,170 @@ class ApplicationState extends ChangeNotifier {
     }
   }
 
+  Future <List> showFriends() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('friends')
+        .where(
+        "user_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    List stockpile = [];
+    for (int i = 0; i < allData.length; i++) {
+
+
+      QuerySnapshot querysec = await FirebaseFirestore.instance.collection('user')
+          .where(
+          "email", isEqualTo: allData[i]['friends'])
+          .get();
+      List halfData = querysec.docs.map((doc) => doc.data()).toList();
+      stockpile.add(halfData[0]['name'].toString());
+
+    }
+
+    return stockpile;
+  }
+
+  Future <List> showGroup() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('group')
+        .where(
+        "user_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    return allData;
+  }
+
+  Future <List> showNotification() async {
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('notification')
+        .where(
+        "receiver_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+
+    return allData;
+  }
+
+  Future<DocumentReference> messageadd(String message, String receiver) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    String writer;
+    writer = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.displayName)!;
+
+
+    return FirebaseFirestore.instance
+        .collection('message')
+        .add(<String, dynamic>{
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'receiver': receiver,
+      'writer':writer,
+      'created': FieldValue.serverTimestamp(),
+      'content':message,
+    });
+
+  }
+
+  Future<DocumentReference> friendadd(String friend) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    String email;
+    email = (FirebaseAuth.instance.currentUser!.isAnonymous ?'Anonymous'
+        : FirebaseAuth.instance.currentUser!.email)!;
+
+    return FirebaseFirestore.instance
+        .collection('friends')
+        .add(<String, dynamic>{
+      'friends': friend,
+      'user_email':email,
+    });
+
+
+  }
+
+  Future<List> friendlist() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('friends')
+        .where("user_email", isEqualTo: auth.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    List friends = ["<FRIENDS LIST>"];
+    for (int i = 0; i < allData.length; i++) {
+      QuerySnapshot quer = await FirebaseFirestore.instance
+          .collection('user')
+          .where("email", isEqualTo: allData[i]["friends"])
+          .get();
+      List halfData = quer.docs.map((doc) => doc.data()).toList();
+      for (int i = 0; i < halfData.length; i++) {
+        friends.add(halfData[i]["name"].toString());
+      }
+    }
+    return friends;
+  }
+
+
+  Future<DocumentReference> newmessage(String recepient, String content) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('user')
+        .where(
+        "name", isEqualTo: recepient.toString())
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    print("good");
+    print(recepient);
+    print(allData[0]['name']);
+    print(content);
+
+    return FirebaseFirestore.instance
+        .collection('message')
+        .add(<String, dynamic>{
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'receiver': allData[0]['name'],
+      'writer':FirebaseAuth.instance.currentUser!.displayName,
+      'created': FieldValue.serverTimestamp(),
+      'content':content,
+
+    });
+
+
+  }
+  Future<void> updateloc(String id) async {
+    print("updateloc");
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+         return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    LocationData tmploc = await location.getLocation();
+    String loc = tmploc.toString();
+
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(id)
+        .update({
+      'loc': loc,
+      'long':tmploc.longitude,
+      'lat':tmploc.latitude,
+    });
+    //notifyListeners();
+  }
 }
-
-
-

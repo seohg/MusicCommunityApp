@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile.dart';
+import 'package:modu/profile_tmp.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'model/product.dart';
@@ -9,6 +9,10 @@ import 'model/comment.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'main.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 var image ='';
 class ProductClass {
@@ -221,8 +225,22 @@ class DetailPageState extends State<DetailPage> {
   late List likeList;
   late bool liked;
   late int count;
+  late double long;
+  late double lat;
   bool showComments = false;
   final _commentController = TextEditingController();
+
+  late GoogleMapController mapController;
+  final LatLng _center = const LatLng(45.521563, -122.677433);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+  static final CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(37.4537251, 126.7960716),
+    zoom: 14.4746,
+  );
+  List<Marker> _markers = [];
 
   DetailPageState(Product product){
     this.product = product;
@@ -231,6 +249,23 @@ class DetailPageState extends State<DetailPage> {
     likeList.contains(FirebaseAuth.instance.currentUser!.uid)
         ? liked = true
         : liked = false;
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc('${product.UID}')
+        .get().then((snapshot) {
+      setState(() {
+        long = snapshot.data()!['long'].toDouble();
+        print("here");
+        print(long);
+        lat = snapshot.data()!['lat'].toDouble();
+        _markers.add(Marker(
+            markerId: MarkerId("1"),
+            draggable: true,
+            onTap: () => print("Marker!"),
+            position: LatLng(lat, long)));
+      });
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -446,14 +481,32 @@ class DetailPageState extends State<DetailPage> {
                           )
                         ],
                       ),
+                    Row(
+                      //mainAxisAlignment: MainAxisAlignment.start,
+                      children:  <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width-100,  // or use fixed size like 200
+                          height: 200,
+                          child: GoogleMap(
+                          mapType: MapType.normal,
+                          markers: Set.from(_markers),
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(37.4219892, -122.0840018),
+                            zoom: 14.4746,
+                          ),
+                          onCameraMove: (_) {},
+                          myLocationButtonEnabled: false,
+                        ),),
+                        ],
+                      ),
 
                       ExpansionTile(
                         leading: Icon(Icons.comment),
                         title: Text("Comments"),
                         onExpansionChanged:(bool expanded){
                           setState(() {
+
                             appState.loadComment(product.id);
-                            appState.notifyListeners();
                             comments = appState.commentList;
                             showComments = expanded;
                           });

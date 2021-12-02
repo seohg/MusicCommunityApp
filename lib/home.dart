@@ -1,13 +1,21 @@
+import 'dart:core';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile.dart';
+import 'package:modu/profile_tmp.dart';
 import 'package:modu/src/authentication.dart';
+import 'package:intl/intl.dart';
 
 import 'board.dart';
+import 'friends.dart';
+import 'group.dart';
+import 'main.dart';
 import 'message.dart';
+import 'model/music.dart';
 import 'musichome.dart';
+import 'notification.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -17,10 +25,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  CollectionReference _collectionRef =
-      FirebaseFirestore.instance.collection('product');
-  CollectionReference _collectionRefe =
-  FirebaseFirestore.instance.collection('message');
+  CollectionReference _collectionRef = FirebaseFirestore.instance.collection('product');
 
 
   Future<List> getBoardData(int num) async {
@@ -29,36 +34,51 @@ class _MyHomePageState extends State<MyHomePage> {
     // Get data from docs and convert map to List
     List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     final picked = allData[num];
+    DateTime tim= DateTime.fromMicrosecondsSinceEpoch(picked["update"].microsecondsSinceEpoch);
+    String formattedtim= DateFormat('MM/dd  (kk:mm)').format(tim);
     List fin = [
       picked["contents"].toString(),
       picked["writer"].toString(),
-      picked["update"].toDate().toString(),
+      formattedtim,
     ];
     return fin;
   }
+  Future<String> getGroupName() async {
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String grpname= allData[0]['group_name'];
+    return grpname;
+  }
+  Future<String> getInstrument() async {
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String ins= allData[0]['instrument'];
+    return ins;
+  }
 
   Future<List> getMessageData(int num) async {
-    // Get docs from collection reference
-    int counter =0;
-    QuerySnapshot querySnapshot = await _collectionRefe.get();
-    // Get data from docs and convert map to List
-    List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    var picked;
-    for(int i=0; i <allData.length; i++) {
-      final temp = allData[i];
-      if ((temp["receiver"].toString()==auth.currentUser!.displayName.toString())&&counter==num){
-      picked = temp;
-      counter++;
-      }
+
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('message').where("receiver", isEqualTo: auth.currentUser!.displayName.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+
+
+    var picked=allData[num];
+    DateTime tim= DateTime.fromMicrosecondsSinceEpoch(picked["created"].microsecondsSinceEpoch);
+    String formattedtim= DateFormat('MM/dd  (kk:mm)').format(tim);
+    if (num>allData.length) {
+      return ['','',''];
     }
+
+
     List fin = [
       picked["content"].toString(),
       picked["writer"].toString(),
       picked["receiver"].toString(),
-      picked["created"].toDate().toString(),
+      formattedtim,
     ];
 
     return fin;
+
   }
 
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -75,7 +95,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return uid;
   }
 
+  List<String> duplicate = [''];
+
+  late List<DocumentSnapshot> snap;
+  int check=0;
+
+  Future <List> _randomMusic(int num) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance.collection('music').get();
+    final List<DocumentSnapshot> documents = result.docs;
+    if (check==0) {
+      documents.shuffle();
+      snap=documents;
+      check=1;
+    }
+    List fin = [
+      snap[num]["artist"].toString(),
+      snap[num]["imageUrl"].toString(),
+      snap[num]["title"].toString(),
+    ];
+    return fin;
+  }
+
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
@@ -100,9 +142,12 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {},
             ),
             ListTile(
-              leading: Icon(Icons.search, color: Colors.black),
-              title: const Text('Search'),
-              onTap: () {},
+              leading: Icon(Icons.people,  color: Colors.black),
+              title: const Text('Friends'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => FriendsPage()));
+              },
             ),
             ListTile(
               leading: Icon(Icons.person, color: Colors.black),
@@ -110,6 +155,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => ProfilePage()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.contacts, color: Colors.black),
+              title: const Text('Group'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => GroupPage()));
               },
             ),
             ListTile(
@@ -135,7 +188,10 @@ class _MyHomePageState extends State<MyHomePage> {
               Icons.notifications_outlined,
               semanticLabel: 'bell',
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()));
+            },
           ),
         ],
       ),
@@ -192,12 +248,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                               style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all(Colors.white),
+                                  MaterialStateProperty.all(Colors.white),
                                   shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(14.0),
+                                          BorderRadius.circular(14.0),
                                           side: BorderSide(
                                               color: Colors.black))))),
                         ),
@@ -208,23 +264,66 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text(getEmail(),
                             style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                            TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                     Row(
                       children: [
                         SizedBox(width: 20),
-                        Text(getUid(),
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                        FutureBuilder(
+                            future: getInstrument(),
+                            builder: (BuildContext context, AsyncSnapshot url) {
+                              if (url.hasData == false) {
+                                return Container(
+                                  width: 115.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else if (url.hasError) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Error: ${url.error}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              } else {
+                                return Text("악기: " +url.data,
+                                    style:
+                                    TextStyle(fontSize: 12, color: Colors.white));
+                              }
+                            }),
                       ],
                     ),
                     Row(
                       children: [
                         SizedBox(width: 20),
-                        Text('소속그룹: Group1',
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                        FutureBuilder(
+                            future: getGroupName(),
+                            builder: (BuildContext context, AsyncSnapshot url) {
+                              if (url.hasData == false) {
+                                return Container(
+                                  width: 115.0,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                  ),
+                                );
+                              } else if (url.hasError) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Error: ${url.error}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              } else {
+                                return Text("소속그룹: " +url.data,
+                                    style:
+                                    TextStyle(fontSize: 12, color: Colors.white));
+                              }
+                            }),
+
                       ],
                     ),
                   ],
@@ -264,7 +363,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -284,17 +383,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height:4),
-                                  Text("  "+ url.data[0]),
-                                  SizedBox(height:15),
-                                  Text(" "+url.data[1]),
-                                  SizedBox(height:2),
-                                  Text(" "+url.data[2]),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -313,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -333,13 +446,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text(url.data[1]),
-                                  Text(url.data[2]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -358,7 +489,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -378,13 +509,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text(url.data[1]),
-                                  Text(url.data[2]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -403,7 +552,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -423,13 +572,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
-                              child: Column(
+                              child:Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text(url.data[1]),
-                                  Text(url.data[2]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -448,7 +615,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -468,18 +635,37 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text(url.data[1]),
-                                  Text(url.data[2]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
                           }
-                        }),
+                        }
+                    ),
                     SizedBox(width: 10),
                   ],
                 ),
@@ -495,7 +681,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                          builder: (context) => MessagePage()));
+                              builder: (context) => MessagePage()));
                     },
                   ),
                 ],
@@ -542,10 +728,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                 BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text("from: " + url.data[1]),
-                                  Text(url.data[3]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[3],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -587,10 +791,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                 BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text("from: " + url.data[1]),
-                                  Text(url.data[3]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[3],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
@@ -632,37 +854,159 @@ class _MyHomePageState extends State<MyHomePage> {
                                 BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(url.data[0]),
-                                  Text("from: " + url.data[1]),
-                                  Text(url.data[3]),
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[3],
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
                           }
                         }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: getMessageData(3),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[3],
+                                      style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: getMessageData(4),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
+
+
+                                  Text("          "+url.data[3],
+                                      style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
                   ],
                 ),
@@ -670,82 +1014,291 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 children: [
                   SizedBox(width: 20),
-                  Text('오늘의 추천음악',
+                  Text('추천음악',
                       style: Theme.of(context).textTheme.headline5),
-                  SizedBox(width: 150),
+                  SizedBox(width: 221),
                   IconButton(
                     icon: Icon(Icons.arrow_right_alt),
                     onPressed: () {
                       Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                      builder: (context) => MusicHomePage()));
-
+                          context,
+                          MaterialPageRoute<void>(
+                              builder: (context) => MusicHomePage()));
                     },
                   ),
                 ],
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 20.0),
-                height: 100.0,
+                height: 170.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: _randomMusic(0),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height:8),
+                                  Container(
+                                    height:100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height:10),
+                                  Text(url.data[2],
+                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                                  Text(url.data[0],
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: _randomMusic(1),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height:8),
+                                  Container(
+                                    height:100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height:10),
+                                  Text(url.data[2],
+                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                                  Text(url.data[0],
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: _randomMusic(2),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height:8),
+                                  Container(
+                                    height:100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height:10),
+                                  Text(url.data[2],
+                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                                  Text(url.data[0],
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: _randomMusic(3),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height:8),
+                                  Container(
+                                    height:100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height:10),
+                                  Text(url.data[2],
+                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                                  Text(url.data[0],
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
-                    Container(
-                      width: 115.0,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        border: Border.all(
-                          color: Colors.white,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: _randomMusic(4),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height:8),
+                                  Container(
+                                    height:100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height:10),
+                                  Text(url.data[2],
+                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
+                                  Text(url.data[0],
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
                     SizedBox(width: 10),
                   ],
                 ),

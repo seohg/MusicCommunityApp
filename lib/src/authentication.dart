@@ -20,14 +20,17 @@ enum ApplicationLoginState {
 
 class Authentication extends StatelessWidget {
 
-  const Authentication({
+
+  Authentication({
     required this.loginState,
     required this.signOut,
   });
 
+
   final ApplicationLoginState loginState;
   final void Function() signOut;
 
+  late bool set = false;
 
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
@@ -49,6 +52,7 @@ class Authentication extends StatelessWidget {
     switch (loginState) {
 
       case ApplicationLoginState.loggedOut:
+        set = false;
         return Scaffold(
             backgroundColor: Colors.white,
             body: Container(
@@ -86,7 +90,6 @@ class Authentication extends StatelessWidget {
                     ),
 
                     SizedBox(height:130),
-
                     SizedBox(height:80),
                     SizedBox(
                       width: 300.0,
@@ -134,23 +137,34 @@ class Authentication extends StatelessWidget {
         );
 
       case ApplicationLoginState.loggedIn:
-        FirebaseAuth.instance.currentUser!.isAnonymous
-            ? FirebaseFirestore.instance
-                      .collection('user')
-                      .doc('${FirebaseAuth.instance.currentUser!.uid}')
-                      .set(<String, dynamic>{
-                    'status_message': 'I promise to take the test honestly before GOD',
-                    'uid':FirebaseAuth.instance.currentUser!.uid,
-                  })
-            : FirebaseFirestore.instance
-                    .collection('user')
-                    .doc('${FirebaseAuth.instance.currentUser!.uid}')
-                    .set(<String, dynamic>{
-                'email': FirebaseAuth.instance.currentUser!.email,
-                'name':FirebaseAuth.instance.currentUser!.displayName,
-                'status_message': 'I promise to take the test honestly before GOD',
-                'uid':FirebaseAuth.instance.currentUser!.uid,
-                });
+        if (set==false) {
+          if(FirebaseAuth.instance.currentUser!.isAnonymous){
+              FirebaseFirestore.instance
+              .collection('user')
+              .doc('${FirebaseAuth.instance.currentUser!.uid}')
+              .set(<String, dynamic>{
+            'status_message': 'I promise to take the test honestly before GOD',
+            'uid': FirebaseAuth.instance.currentUser!.uid,
+            'loc': "",
+            'long': 0,
+            'lat': 0,
+          });
+          }else {
+            FirebaseFirestore.instance
+                .collection('user')
+                .doc('${FirebaseAuth.instance.currentUser!.uid}')
+                .set(<String, dynamic>{
+            'email': FirebaseAuth.instance.currentUser!.email,
+            'name': FirebaseAuth.instance.currentUser!.displayName,
+            'status_message': 'I promise to take the test honestly before GOD',
+            'uid': FirebaseAuth.instance.currentUser!.uid,
+            },SetOptions(merge: true));
+
+
+          }
+
+          set = true;
+        }
         return MyHomePage();
     }
     return BoardPage();
