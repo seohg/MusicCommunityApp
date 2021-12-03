@@ -2,7 +2,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile.dart';
+import 'package:modu/profile_tmp.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'model/music.dart';

@@ -76,19 +76,19 @@ class GroupPageState extends State<GroupPage> {
                     } else {
                       return Column(
                           children: [
-                        SizedBox(height: 10),
+                            SizedBox(height: 10),
 
-                        Text(url.data[0]['group_name'],
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.black)),
-                        Text(
-                          url.data[0]['instrument'],
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 15),
-                      ]);
+                            Text(url.data[0]['group_name'],
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black)),
+                            Text(
+                              url.data[0]['instrument'],
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 15),
+                          ]);
                     }
                   }),
             )

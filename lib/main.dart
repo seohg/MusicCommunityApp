@@ -10,6 +10,7 @@ import 'model/music.dart';
 import 'model/product.dart';
 import 'model/comment.dart';
 import 'src/authentication.dart';
+import 'package:location/location.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -59,10 +60,13 @@ class HomePage extends StatelessWidget {
 
 class ApplicationState extends ChangeNotifier {
   late List<Comment> commentList = [];
+  Location location = new Location();
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
+
   ApplicationState() {
     init();
   }
-
   Future<void> init() async {
     await Firebase.initializeApp();
     FirebaseAuth.instance.userChanges().listen((user) {
@@ -222,11 +226,11 @@ class ApplicationState extends ChangeNotifier {
         .collection('product')
         .doc(id)
         .update({
-          'title': name,
-          'contents': description,
-          'update': FieldValue.serverTimestamp(),
-          'UID':FirebaseAuth.instance.currentUser!.uid,
-        });
+      'title': name,
+      'contents': description,
+      'update': FieldValue.serverTimestamp(),
+      'UID':FirebaseAuth.instance.currentUser!.uid,
+    });
     notifyListeners();
   }
   Future<void> sort(bool desc) async {
@@ -265,8 +269,8 @@ class ApplicationState extends ChangeNotifier {
         .collection('user')
         .doc(id)
         .update({
-          'status_message': status,
-        });
+      'status_message': status,
+    });
     //notifyListeners();
   }
   Future<DocumentReference> commentadd(String docid,String comment) async {
@@ -459,8 +463,39 @@ class ApplicationState extends ChangeNotifier {
 
 
   }
+  Future<void> updateloc(String id) async {
+    print("updateloc");
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
 
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+         return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    LocationData tmploc = await location.getLocation();
+    String loc = tmploc.toString();
+
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(id)
+        .update({
+      'loc': loc,
+      'long':tmploc.longitude,
+      'lat':tmploc.latitude,
+    });
+    //notifyListeners();
+  }
 }
-
-
-

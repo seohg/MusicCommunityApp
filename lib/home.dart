@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile.dart';
+import 'package:modu/profile_tmp.dart';
 import 'package:modu/src/authentication.dart';
 import 'package:intl/intl.dart';
 
@@ -70,14 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
 
-      List fin = [
-        picked["content"].toString(),
-        picked["writer"].toString(),
-        picked["receiver"].toString(),
-        formattedtim,
-      ];
+    List fin = [
+      picked["content"].toString(),
+      picked["writer"].toString(),
+      picked["receiver"].toString(),
+      formattedtim,
+    ];
 
-      return fin;
+    return fin;
 
   }
 
@@ -248,12 +248,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                               style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all(Colors.white),
+                                  MaterialStateProperty.all(Colors.white),
                                   shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(14.0),
+                                          BorderRadius.circular(14.0),
                                           side: BorderSide(
                                               color: Colors.black))))),
                         ),
@@ -264,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text(getEmail(),
                             style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                            TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                     Row(
@@ -363,7 +363,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -383,7 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -446,7 +446,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,7 +489,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -509,7 +509,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +552,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -572,33 +572,33 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child:Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height:4),
-                                Container(
-                                  height:50,
-                                  child: Text("  "+ url.data[0],
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      softWrap: false,
-                                      style: TextStyle(fontSize: 15)),
-                                ),
-                                SizedBox(height:10),
-                                Container(
-                                  width:105,
-                                  child: Text(url.data[1],
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                    ,textAlign: TextAlign.right,),
-                                ),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
 
 
-                                Text("          "+url.data[2],
-                                    style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
                             );
                           }
                         }),
@@ -615,7 +615,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -635,37 +635,37 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height:4),
-                                Container(
-                                  height:50,
-                                  child: Text("  "+ url.data[0],
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      softWrap: false,
-                                      style: TextStyle(fontSize: 15)),
-                                ),
-                                SizedBox(height:10),
-                                Container(
-                                  width:105,
-                                  child: Text(url.data[1],
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                    ,textAlign: TextAlign.right,),
-                                ),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height:4),
+                                  Container(
+                                    height:50,
+                                    child: Text("  "+ url.data[0],
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                        style: TextStyle(fontSize: 15)),
+                                  ),
+                                  SizedBox(height:10),
+                                  Container(
+                                    width:105,
+                                    child: Text(url.data[1],
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
+                                      ,textAlign: TextAlign.right,),
+                                  ),
 
 
-                                Text("          "+url.data[2],
-                                    style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
+                                  Text("          "+url.data[2],
+                                      style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
                             );
                           }
                         }
-                        ),
+                    ),
                     SizedBox(width: 10),
                   ],
                 ),
@@ -681,7 +681,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                          builder: (context) => MessagePage()));
+                              builder: (context) => MessagePage()));
                     },
                   ),
                 ],
@@ -1021,9 +1021,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.arrow_right_alt),
                     onPressed: () {
                       Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                      builder: (context) => MusicHomePage()));
+                          context,
+                          MaterialPageRoute<void>(
+                              builder: (context) => MusicHomePage()));
                     },
                   ),
                 ],
@@ -1073,7 +1073,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   SizedBox(height:8),
                                   Container(
-                                     height:100,
+                                    height:100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
@@ -1081,7 +1081,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   Text(url.data[2],
                                       style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
                                   Text(url.data[0],
-                                      style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
                                 ],
                               ),
                             );

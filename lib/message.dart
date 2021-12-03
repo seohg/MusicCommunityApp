@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile.dart';
+import 'package:modu/profile_tmp.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'messagewrite.dart';
@@ -119,48 +119,48 @@ class MessagePageState extends State<MessagePage> {
         name=mess.receiver;
       }
       return Card(
-        clipBehavior: Clip.antiAlias,
-        elevation: 5,
-        child: Row(
-                children: <Widget>[
-                  SizedBox(width: 12.0),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                              builder: (context) => MessageWritePage(
-                                  message: mess, title: name)));
-                    },
-                    child: Container(
-                      height: 100,
-                      child: Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10, top: 5),
-                          child: Column(
+          clipBehavior: Clip.antiAlias,
+          elevation: 5,
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 12.0),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                          builder: (context) => MessageWritePage(
+                              message: mess, title: name)));
+                },
+                child: Container(
+                  height: 100,
+                  child: Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, top: 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(width: 8.0),
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              SizedBox(width: 8.0),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  SizedBox(height: 20),
-                                  Text(
-                                    name,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
+                              SizedBox(height: 20),
+                              Text(
+                                name,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              )
+                ),
+              ),
+            ],
+          )
 
       );
     }).toList();
@@ -242,10 +242,10 @@ class MessagePageState extends State<MessagePage> {
                                 builder: (BuildContext context, AsyncSnapshot url) {
                                   if (url.hasData == false) {
                                     return Container(
-                                      alignment:Alignment.center,
-                                      width: 150,
-                                      height: 48,
-                                      child: Text("Bringing Friends...")
+                                        alignment:Alignment.center,
+                                        width: 150,
+                                        height: 48,
+                                        child: Text("Bringing Friends...")
                                     );
                                   } else if (url.hasError) {
                                     return Padding(
@@ -304,10 +304,10 @@ class MessagePageState extends State<MessagePage> {
                               padding: EdgeInsets.all(8.0),
 
 
-                                child:TextFormField(
-                                  controller: _secondaryController,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
+                              child:TextFormField(
+                                controller: _secondaryController,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
                               ),
                             ),
                             Padding(

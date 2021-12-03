@@ -38,7 +38,7 @@ class MessageWritePageState extends State<MessageWritePage> {
 
   messageSubmit(String message) {
     CollectionReference messages =
-        FirebaseFirestore.instance.collection('message');
+    FirebaseFirestore.instance.collection('message');
     FirebaseAuth auth = FirebaseAuth.instance;
     messages.add({
       'id': auth.currentUser!.uid.toString(),
@@ -74,56 +74,56 @@ class MessageWritePageState extends State<MessageWritePage> {
     return newmess.map((mess) {
       bool color = mess.writer != auth.currentUser!.displayName.toString();
       return Card(
-        clipBehavior: Clip.antiAlias,
-        elevation: 5,
-        color: color ? Colors.grey[350] : Colors.white,
-        child: /*checker ?*/ Row(
-                children: <Widget>[
-                  Container(
-                    height: 100,
-                    color: color ? Colors.grey[350] : Colors.white,
-                    child: Expanded(
-                      flex: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 5, top: 5),
-                        child: Column(
+          clipBehavior: Clip.antiAlias,
+          elevation: 5,
+          color: color ? Colors.grey[350] : Colors.white,
+          child: /*checker ?*/ Row(
+            children: <Widget>[
+              Container(
+                height: 100,
+                color: color ? Colors.grey[350] : Colors.white,
+                child: Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5, top: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(width: 8.0),
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            SizedBox(width: 8.0),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                    mess.content,
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
-                                    maxLines: 1,
-                                  ),
-                                ),
-                                Text(
-                                  "From: " + mess.writer,
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  "To: " + mess.receiver,
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            Container(
+                              child: Text(
+                                mess.content,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                              ),
+                            ),
+                            Text(
+                              "From: " + mess.writer,
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              "To: " + mess.receiver,
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ],
-              )
-            //: null,
+                ),
+              ),
+            ],
+          )
+        //: null,
       );
     }).toList();
   }
@@ -131,7 +131,7 @@ class MessageWritePageState extends State<MessageWritePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        //key: _scaffoldKey,
+      //key: _scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.black,
           centerTitle: true,

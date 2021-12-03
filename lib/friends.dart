@@ -45,71 +45,71 @@ class FriendsPageState extends State<FriendsPage> {
 
       ),
 
-    body: Center(
+      body: Center(
         child: Column(
           children: [
-        Consumer<ApplicationState>(
-        builder: (context, appState, _) =>
-            FutureBuilder(
-                future: appState.showFriends(),
-                builder: (BuildContext context, AsyncSnapshot url) {
-                  if (url.hasData == false) {
-                    return Container(
-                      alignment: Alignment.center,
-                        width: 400.0,
-                        height: 400,
-                        margin: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          border: Border.all(
-                            color: Colors.white,
-                          ),
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(10)),
-                        ),
-                    child: Text("BRINGING LIST OF FRIENDS!!",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
-                  } else if (url.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Error: ${url.error}',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    );
-                  } else {
-                    return Column(
-                        children: [
-                          SizedBox(height:10),
-
-                          for (var i = 0; i < url.data.length; i++) Container(
-                          width: 400.0,
-                          margin: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            border: Border.all(
-                              color: Colors.white,
+            Consumer<ApplicationState>(
+              builder: (context, appState, _) =>
+                  FutureBuilder(
+                      future: appState.showFriends(),
+                      builder: (BuildContext context, AsyncSnapshot url) {
+                        if (url.hasData == false) {
+                          return Container(
+                              alignment: Alignment.center,
+                              width: 400.0,
+                              height: 400,
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Text("BRINGING LIST OF FRIENDS!!",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
+                        } else if (url.hasError) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Error: ${url.error}',
+                              style: TextStyle(fontSize: 15),
                             ),
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(height:15),
-                              Text(temp.toString(),
-                                style: TextStyle(fontSize: 1, color: Colors.grey[300])),
-                              Text(url.data[i],
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
-                              SizedBox(height:15),
-                            ],
-                          ),
-                        )
-                        ]
-                  );
-                  }
-                }
-            ),
-        )],
+                          );
+                        } else {
+                          return Column(
+                              children: [
+                                SizedBox(height:10),
+
+                                for (var i = 0; i < url.data.length; i++) Container(
+                                  width: 400.0,
+                                  margin: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    border: Border.all(
+                                      color: Colors.white,
+                                    ),
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height:15),
+                                      Text(temp.toString(),
+                                          style: TextStyle(fontSize: 1, color: Colors.grey[300])),
+                                      Text(url.data[i],
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                                      SizedBox(height:15),
+                                    ],
+                                  ),
+                                )
+                              ]
+                          );
+                        }
+                      }
+                  ),
+            )],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
