@@ -9,6 +9,7 @@ import 'model/mess.dart';
 import 'model/music.dart';
 import 'model/product.dart';
 import 'model/comment.dart';
+import 'model/event.dart';
 import 'src/authentication.dart';
 import 'package:location/location.dart';
 
@@ -60,6 +61,7 @@ class HomePage extends StatelessWidget {
 
 class ApplicationState extends ChangeNotifier {
   late List<Comment> commentList = [];
+  late List<Event> eventList = [];
   Location location = new Location();
   bool _serviceEnabled = false;
   PermissionStatus _permissionGranted = PermissionStatus.denied;
@@ -170,6 +172,8 @@ class ApplicationState extends ChangeNotifier {
         _commentSubscription?.cancel();
         _musicList=[];
         _musicSubscription?.cancel();
+        _EventList=[];
+        _eventSubscription?.cancel();
       }
       notifyListeners();
     });
@@ -180,6 +184,7 @@ class ApplicationState extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? _productSubscription;
   StreamSubscription<QuerySnapshot>? _messageSubscription;
   StreamSubscription<QuerySnapshot>? _commentSubscription;
+  StreamSubscription<QuerySnapshot>? _eventSubscription;
   StreamSubscription<QuerySnapshot>? _musicSubscription;
   List<Product> _productMessages = [];
   List<Product> get productMessages => _productMessages;
@@ -187,6 +192,8 @@ class ApplicationState extends ChangeNotifier {
   List<Mess> get messMessages => _messMessages;
   List<Comment> _commentofDoc = [];
   List<Comment> get commentofDoc => _commentofDoc;
+  List<Event> _EventList = [];
+  List<Event> get EventList => _EventList;
   List<Music> _musicList = [];
   List<Music> get musicList => _musicList;
 
@@ -292,7 +299,6 @@ class ApplicationState extends ChangeNotifier {
       'time': FieldValue.serverTimestamp(),
       'comment':comment,
     });
-
   }
   Future<void> loadComment(String _docid) async {
     try {
@@ -497,5 +503,59 @@ class ApplicationState extends ChangeNotifier {
       'lat':tmploc.latitude,
     });
     //notifyListeners();
+  }
+
+  Future<void> loadSchedule(String today) async {
+    try {
+
+      _eventSubscription =
+          FirebaseFirestore.instance
+              .collection('schedule')
+              .where('userid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+              .orderBy('date', descending: false)
+              .snapshots()
+              .listen((snapshot) {
+            _EventList = [];
+            for (final document in snapshot.docs) {
+              //print(today);
+              //print(document.data()['date']);
+              if(today==document.data()['date']) {
+                _EventList.add(
+                  Event(
+                    userid: document.data()['userid'] as String,
+                    date: document.data()['date'] as String,
+                    hour: document.data()['hour'] as int,
+                    min: document.data()['min'] as int,
+                    title: document.data()['title'] as String,
+                    contents: document.data()['contents'] as String,
+                  ),
+                );
+              }
+
+            }
+            eventList = _EventList;
+            notifyListeners();
+          });
+    }catch(e){
+      _EventList = [];
+      eventList= [];
+    }
+  }
+
+  Future<DocumentReference> eventadd(String title,String contents,String date, int hour, int min) async {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Must be logged in');
+    }
+
+    return FirebaseFirestore.instance
+        .collection('schedule')
+        .add(<String, dynamic>{
+      'title': title,
+      'contents':contents,
+      'userid': FirebaseAuth.instance.currentUser!.uid,
+      'date': date,
+      'hour':hour,
+      'min':min,
+    });
   }
 }

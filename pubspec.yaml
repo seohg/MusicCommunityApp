@@ -22,7 +22,9 @@ dependencies:
   assets_audio_player: ^3.0.3+1
   location: ^4.2.0
   google_maps_flutter: 2.0.4
-
+  table_calendar: ^3.0.3
+  flutter_datetime_picker: ^1.5.1
+  firebase_messaging: ^11.2.0
 
 
 dev_dependencies:
