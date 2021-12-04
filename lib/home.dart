@@ -9,6 +9,7 @@ import 'package:modu/src/authentication.dart';
 import 'package:intl/intl.dart';
 
 import 'board.dart';
+import 'calendar.dart';
 import 'friends.dart';
 import 'group.dart';
 import 'main.dart';
@@ -163,6 +164,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => GroupPage()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.calendar_today, color: Colors.black),
+              title: const Text('Schedule'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CalendarPage()));
               },
             ),
             ListTile(
