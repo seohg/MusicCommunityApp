@@ -12,6 +12,7 @@ import 'model/comment.dart';
 import 'model/event.dart';
 import 'src/authentication.dart';
 import 'package:location/location.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -377,6 +378,34 @@ class ApplicationState extends ChangeNotifier {
         "receiver_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('schedule')
+        .where(
+        "userid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    List temp = quer.docs.map((doc) => doc.data()).toList();
+
+    DateTime now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formattedDate = formatter.format(now);
+
+
+    for(int i=0; i<temp.length; i++) {
+      if (temp[i]['date']==formattedDate) {
+        temp[i]['content']=temp[i]['contents'];
+        temp[i]['type']='schedule';
+        temp[i]['receiver_email']=FirebaseAuth.instance.currentUser!.email;
+        temp[i]['sender_email']=FirebaseAuth.instance.currentUser!.email;
+        temp[i]['created']=FieldValue.serverTimestamp();
+        temp[i].removeWhere((key, value) => key == "contents");
+        temp[i].removeWhere((key, value) => key == "min");
+        temp[i].removeWhere((key, value) => key == "hour");
+        temp[i].removeWhere((key, value) => key == "userid");
+        temp[i].removeWhere((key, value) => key == "title");
+        temp[i].removeWhere((key, value) => key == "date");
+        print(temp[i]);
+        allData.add(temp[i]);
+      }
+    }
 
     return allData;
   }
@@ -416,8 +445,6 @@ class ApplicationState extends ChangeNotifier {
       'friends': friend,
       'user_email':email,
     });
-
-
   }
 
   Future<List> friendlist() async {
@@ -440,6 +467,69 @@ class ApplicationState extends ChangeNotifier {
     }
     return friends;
   }
+  Future <DocumentReference>getinGroup(String groupName, String captainEmail, String instrument, String username, String email) async {
+
+    return FirebaseFirestore.instance
+        .collection('group')
+        .add(<String, dynamic>{
+      'captain_email': captainEmail,
+      'instrument':instrument,
+      'group_name':groupName,
+      'user_name': username,
+      'user_email':email,
+    });
+  }
+
+
+  Future<DocumentReference?> createGroup(String groupName, String groupGenre, String description, String instrument) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    Location location = Location();
+    LocationData _locationData;
+
+    _locationData = await location.getLocation();
+
+
+
+    return FirebaseFirestore.instance
+        .collection('band')
+        .add(<String, dynamic>{
+      'captain_email': FirebaseAuth.instance.currentUser!.email,
+      'captain_name': FirebaseAuth.instance.currentUser!.displayName,
+      'group_genre':groupGenre,
+      'group_name':groupName,
+      'loc': _locationData.toString(),
+      'description':description,
+    });
+  }
+
+
+  Future<DocumentReference?> groupRequest(String type, String email, String instrument, String content) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    String groupEmail;
+    if(email=="empty") {
+      QuerySnapshot query = await FirebaseFirestore.instance
+          .collection('group')
+          .where("user_email", isEqualTo: auth.currentUser!.email)
+          .get();
+      List allData = query.docs.map((doc) => doc.data()).toList();
+      groupEmail =allData[0]['captain_email'].toString();
+    }
+    else
+      groupEmail=email;
+
+
+    return FirebaseFirestore.instance
+        .collection('notification')
+        .add(<String, dynamic>{
+      'sender_email': FirebaseAuth.instance.currentUser!.email,
+      'receiver_email': groupEmail,
+      'type':type,
+      'instrument':instrument,
+      'created': FieldValue.serverTimestamp(),
+      'content':content,
+    });
+  }
 
 
   Future<DocumentReference> newmessage(String recepient, String content) async {
@@ -451,10 +541,9 @@ class ApplicationState extends ChangeNotifier {
         "name", isEqualTo: recepient.toString())
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
-    print("good");
-    print(recepient);
-    print(allData[0]['name']);
-    print(content);
+
+
+
 
     return FirebaseFirestore.instance
         .collection('message')
@@ -479,7 +568,7 @@ class ApplicationState extends ChangeNotifier {
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-         return;
+        return;
       }
     }
 
@@ -504,6 +593,15 @@ class ApplicationState extends ChangeNotifier {
     });
     //notifyListeners();
   }
+
+  Future<String> getInstrument() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String ins= allData[0]['instrument'];
+    return ins;
+  }
+
 
   Future<void> loadSchedule(String today) async {
     try {

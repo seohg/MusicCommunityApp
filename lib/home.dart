@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:modu/profile_tmp.dart';
 import 'package:modu/src/authentication.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import 'board.dart';
 import 'calendar.dart';
@@ -26,8 +27,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  CollectionReference _collectionRef = FirebaseFirestore.instance.collection('product');
-
+  CollectionReference _collectionRef =
+  FirebaseFirestore.instance.collection('product');
 
   Future<List> getBoardData(int num) async {
     // Get docs from collection reference
@@ -35,8 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // Get data from docs and convert map to List
     List allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     final picked = allData[num];
-    DateTime tim= DateTime.fromMicrosecondsSinceEpoch(picked["update"].microsecondsSinceEpoch);
-    String formattedtim= DateFormat('MM/dd  (kk:mm)').format(tim);
+    DateTime tim = DateTime.fromMicrosecondsSinceEpoch(
+        picked["update"].microsecondsSinceEpoch);
+    String formattedtim = DateFormat('MM/dd  (kk:mm)').format(tim);
     List fin = [
       picked["contents"].toString(),
       picked["writer"].toString(),
@@ -44,32 +46,41 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return fin;
   }
+
   Future<String> getGroupName() async {
-    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    QuerySnapshot quer = await FirebaseFirestore.instance
+        .collection('group')
+        .where("user_email", isEqualTo: auth.currentUser!.email.toString())
+        .get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
-    String grpname= allData[0]['group_name'];
+    String grpname = allData[0]['group_name'];
     return grpname;
   }
+
   Future<String> getInstrument() async {
-    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    QuerySnapshot quer = await FirebaseFirestore.instance
+        .collection('group')
+        .where("user_email", isEqualTo: auth.currentUser!.email.toString())
+        .get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
-    String ins= allData[0]['instrument'];
+    String ins = allData[0]['instrument'];
     return ins;
   }
 
   Future<List> getMessageData(int num) async {
-
-    QuerySnapshot quer = await FirebaseFirestore.instance.collection('message').where("receiver", isEqualTo: auth.currentUser!.displayName.toString()).get();
+    QuerySnapshot quer = await FirebaseFirestore.instance
+        .collection('message')
+        .where("receiver", isEqualTo: auth.currentUser!.displayName.toString())
+        .get();
     List allData = quer.docs.map((doc) => doc.data()).toList();
 
-
-    var picked=allData[num];
-    DateTime tim= DateTime.fromMicrosecondsSinceEpoch(picked["created"].microsecondsSinceEpoch);
-    String formattedtim= DateFormat('MM/dd  (kk:mm)').format(tim);
-    if (num>allData.length) {
-      return ['','',''];
+    var picked = allData[num];
+    DateTime tim = DateTime.fromMicrosecondsSinceEpoch(
+        picked["created"].microsecondsSinceEpoch);
+    String formattedtim = DateFormat('MM/dd  (kk:mm)').format(tim);
+    if (num > allData.length) {
+      return ['', '', ''];
     }
-
 
     List fin = [
       picked["content"].toString(),
@@ -79,7 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
 
     return fin;
-
   }
 
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -99,15 +109,16 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> duplicate = [''];
 
   late List<DocumentSnapshot> snap;
-  int check=0;
+  int check = 0;
 
-  Future <List> _randomMusic(int num) async {
-    final QuerySnapshot result = await FirebaseFirestore.instance.collection('music').get();
+  Future<List> _randomMusic(int num) async {
+    final QuerySnapshot result =
+    await FirebaseFirestore.instance.collection('music').get();
     final List<DocumentSnapshot> documents = result.docs;
-    if (check==0) {
+    if (check == 0) {
       documents.shuffle();
-      snap=documents;
-      check=1;
+      snap = documents;
+      check = 1;
     }
     List fin = [
       snap[num]["artist"].toString(),
@@ -118,7 +129,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(
@@ -143,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {},
             ),
             ListTile(
-              leading: Icon(Icons.people,  color: Colors.black),
+              leading: Icon(Icons.people, color: Colors.black),
               title: const Text('Friends'),
               onTap: () {
                 Navigator.push(context,
@@ -191,7 +201,17 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       appBar: AppBar(
         backgroundColor: Colors.black,
-        actions: <Widget>[
+        actions: <Widget>[IconButton(
+          icon: Icon(
+            Icons.refresh,
+            semanticLabel: 'refresh',
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HomePage()));
+          },
+        ),
           IconButton(
             icon: Icon(
               Icons.notifications_outlined,
@@ -252,8 +272,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: FontWeight.bold),
                               ),
                               onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => ProfilePage()));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ProfilePage()));
                               },
                               style: ButtonStyle(
                                   backgroundColor:
@@ -279,30 +301,33 @@ class _MyHomePageState extends State<MyHomePage> {
                     Row(
                       children: [
                         SizedBox(width: 20),
-                        FutureBuilder(
-                            future: getInstrument(),
-                            builder: (BuildContext context, AsyncSnapshot url) {
-                              if (url.hasData == false) {
-                                return Container(
-                                  width: 115.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                  ),
-                                );
-                              } else if (url.hasError) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Error: ${url.error}',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                );
-                              } else {
-                                return Text("악기: " +url.data,
-                                    style:
-                                    TextStyle(fontSize: 12, color: Colors.white));
-                              }
-                            }),
+                        Consumer<ApplicationState>(
+                          builder: (context, appState, _) => FutureBuilder(
+                              future: appState.getInstrument(),
+                              builder:
+                                  (BuildContext context, AsyncSnapshot url) {
+                                if (url.hasData == false) {
+                                  return Container(
+                                    width: 115.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                } else if (url.hasError) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Error: ${url.error}',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  );
+                                } else {
+                                  return Text("악기: " + url.data,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white));
+                                }
+                              }),
+                        ),
                       ],
                     ),
                     Row(
@@ -327,12 +352,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                 );
                               } else {
-                                return Text("소속그룹: " +url.data,
-                                    style:
-                                    TextStyle(fontSize: 12, color: Colors.white));
+                                return Text("소속그룹: " + url.data,
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.white));
                               }
                             }),
-
                       ],
                     ),
                   ],
@@ -397,25 +421,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[2],
+                                  Text("          " + url.data[2],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -460,25 +486,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[2],
+                                  Text("          " + url.data[2],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -523,25 +551,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[2],
+                                  Text("          " + url.data[2],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -583,28 +613,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(10)),
                               ),
-                              child:Column(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[2],
+                                  Text("          " + url.data[2],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -649,32 +681,33 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[2],
+                                  Text("          " + url.data[2],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             );
                           }
-                        }
-                    ),
+                        }),
                     SizedBox(width: 10),
                   ],
                 ),
@@ -713,6 +746,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 10.0,
+                                  offset: Offset(10.0, 5.0),
+                                  ),
+                                ],
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(10)),
                               ),
@@ -739,25 +779,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[3],
+                                  Text("          " + url.data[3],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -802,25 +844,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[3],
+                                  Text("          " + url.data[3],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -865,25 +909,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[3],
+                                  Text("          " + url.data[3],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -928,25 +974,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[3],
+                                  Text("          " + url.data[3],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -965,6 +1013,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
+
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(10)),
                               ),
@@ -991,25 +1040,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4),
+                                  SizedBox(height: 4),
                                   Container(
-                                    height:50,
-                                    child: Text("  "+ url.data[0],
+                                    height: 50,
+                                    child: Text("  " + url.data[0],
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         softWrap: false,
                                         style: TextStyle(fontSize: 15)),
                                   ),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Container(
-                                    width:105,
-                                    child: Text(url.data[1],
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)
-                                      ,textAlign: TextAlign.right,),
+                                    width: 105,
+                                    child: Text(
+                                      url.data[1],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-
-
-                                  Text("          "+url.data[3],
+                                  Text("          " + url.data[3],
                                       style: TextStyle(fontSize: 12)),
                                 ],
                               ),
@@ -1023,8 +1074,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 children: [
                   SizedBox(width: 20),
-                  Text('추천음악',
-                      style: Theme.of(context).textTheme.headline5),
+                  Text('추천음악', style: Theme.of(context).textTheme.headline5),
                   SizedBox(width: 221),
                   IconButton(
                     icon: Icon(Icons.arrow_right_alt),
@@ -1075,22 +1125,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height:8),
+                                  SizedBox(height: 8),
                                   Container(
-                                    height:100,
+                                    height: 100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Text(url.data[2],
-                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
-                                  Text(url.data[0],
-                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             );
@@ -1128,22 +1185,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height:8),
+                                  SizedBox(height: 8),
                                   Container(
-                                    height:100,
+                                    height: 100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Text(url.data[2],
-                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
-                                  Text(url.data[0],
-                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             );
@@ -1181,22 +1245,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height:8),
+                                  SizedBox(height: 8),
                                   Container(
-                                    height:100,
+                                    height: 100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Text(url.data[2],
-                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
-                                  Text(url.data[0],
-                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             );
@@ -1234,22 +1305,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height:8),
+                                  SizedBox(height: 8),
                                   Container(
-                                    height:100,
+                                    height: 100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Text(url.data[2],
-                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
-                                  Text(url.data[0],
-                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             );
@@ -1267,8 +1345,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
+
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1286,23 +1364,32 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: Colors.grey[300],
                                 border: Border.all(
                                   color: Colors.white,
+
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(height:8),
+                                  SizedBox(height: 8),
                                   Container(
-                                    height:100,
+                                    height: 100,
                                     child: Image.network(url.data[1]),
                                   ),
                                   //Image.network(url.data[1]),
-                                  SizedBox(height:10),
+                                  SizedBox(height: 10),
                                   Text(url.data[2],
-                                      style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold),textAlign: TextAlign.center),
-                                  Text(url.data[0],
-                                    style: TextStyle(fontSize: 12),textAlign: TextAlign.center,),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ],
                               ),
                             );

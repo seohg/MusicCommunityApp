@@ -128,7 +128,13 @@ class CalendarPageState extends State<CalendarPage> {
         builder: (context, appState, _) =>Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            TableCalendar(
+
+
+            Expanded(
+            child: SizedBox(
+              height: 300,
+
+              child: TableCalendar(
               focusedDay: selectedDay,
               firstDay: DateTime(1990),
               lastDay: DateTime(2050),
@@ -182,6 +188,8 @@ class CalendarPageState extends State<CalendarPage> {
                 ),
               ),
             ),
+            ),
+            ),
 
 
             ExpansionTile(
@@ -201,7 +209,9 @@ class CalendarPageState extends State<CalendarPage> {
                 List<Widget>.generate(appState.eventList.length, (idx) {
                   events=[];
                   events = appState.eventList;
-                  return Container(
+                  return Padding(
+                    padding:EdgeInsets.fromLTRB(5, 10, 10, 10),
+                    child:Container(
                     width: double.infinity,
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Column(
@@ -233,7 +243,7 @@ class CalendarPageState extends State<CalendarPage> {
                         ),
                       ],
                     ),
-                  );
+                  ),);
                 }).toList()
 
             ),
