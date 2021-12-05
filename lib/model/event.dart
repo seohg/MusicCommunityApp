@@ -8,4 +8,5 @@ class Event{
   final int min;
   final String title;
   final String contents;
+ // final String receiver_email;
 }

@@ -27,6 +27,8 @@ class NotificationPageState extends State<NotificationPage> {
           instrument;
     else if (type == 'exit')
       msg = "\"" + email + "\" has sent a group exit request";
+    else if (type == 'schedule')
+      msg = "You have a schedule today! " ;
 
     return msg;
   }
@@ -93,7 +95,19 @@ class NotificationPageState extends State<NotificationPage> {
             Navigator.pop(context);
           },
         ),
-        actions: <Widget>[],
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.refresh,
+              semanticLabel: 'refresh',
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => NotificationPage()));
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -143,7 +157,8 @@ class NotificationPageState extends State<NotificationPage> {
                                 Text(notificationContent(
                                     url.data[i]['sender_email'],
                                     url.data[i]['type'],
-                                    url.data[i]['instrument'])),
+                                    url.data[i]['instrument'],
+                                )),
                                 Text(
                                   url.data[i]['content'],
                                   style: TextStyle(
@@ -155,6 +170,7 @@ class NotificationPageState extends State<NotificationPage> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    if(url.data[i]['type']!="schedule")
                                     RaisedButton(
                                       child: Text("Accept"),
                                       onPressed: () {
@@ -184,8 +200,10 @@ class NotificationPageState extends State<NotificationPage> {
                                                     NotificationPage()));
                                       },
                                     ),
-                                    SizedBox(width: 15),
-                                    RaisedButton(
+                                    if(url.data[i]['type']!="schedule")
+                                      SizedBox(width: 15),
+                                    if(url.data[i]['type']!="schedule")
+                                      RaisedButton(
                                       child: Text("Decline"),
                                       onPressed: () {
                                         setState(() {

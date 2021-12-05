@@ -12,6 +12,7 @@ import 'model/comment.dart';
 import 'model/event.dart';
 import 'src/authentication.dart';
 import 'package:location/location.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -377,6 +378,34 @@ class ApplicationState extends ChangeNotifier {
         "receiver_email", isEqualTo: FirebaseAuth.instance.currentUser!.email)
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('schedule')
+        .where(
+        "userid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    List temp = quer.docs.map((doc) => doc.data()).toList();
+
+    DateTime now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formattedDate = formatter.format(now);
+
+
+    for(int i=0; i<temp.length; i++) {
+      if (temp[i]['date']==formattedDate) {
+        temp[i]['content']=temp[i]['contents'];
+        temp[i]['type']='schedule';
+        temp[i]['receiver_email']=FirebaseAuth.instance.currentUser!.email;
+        temp[i]['sender_email']=FirebaseAuth.instance.currentUser!.email;
+        temp[i]['created']=FieldValue.serverTimestamp();
+        temp[i].removeWhere((key, value) => key == "contents");
+        temp[i].removeWhere((key, value) => key == "min");
+        temp[i].removeWhere((key, value) => key == "hour");
+        temp[i].removeWhere((key, value) => key == "userid");
+        temp[i].removeWhere((key, value) => key == "title");
+        temp[i].removeWhere((key, value) => key == "date");
+        print(temp[i]);
+        allData.add(temp[i]);
+      }
+    }
 
     return allData;
   }
@@ -564,6 +593,15 @@ class ApplicationState extends ChangeNotifier {
     });
     //notifyListeners();
   }
+
+  Future<String> getInstrument() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String ins= allData[0]['instrument'];
+    return ins;
+  }
+
 
   Future<void> loadSchedule(String today) async {
     try {
