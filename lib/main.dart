@@ -506,6 +506,13 @@ class ApplicationState extends ChangeNotifier {
 
   Future<DocumentReference?> groupRequest(String type, String email, String instrument, String content) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('band')
+        .where("group_name", isEqualTo: email)
+        .get();
+    List tempData = query.docs.map((doc) => doc.data()).toList();
+    var tempEmail = tempData[0]['captain_email'];
+
     String groupEmail;
     if(email=="empty") {
       QuerySnapshot query = await FirebaseFirestore.instance
@@ -516,9 +523,12 @@ class ApplicationState extends ChangeNotifier {
       groupEmail =allData[0]['captain_email'].toString();
     }
     else
-      groupEmail=email;
+      groupEmail=tempEmail;
 
-
+    print(groupEmail);
+    print(instrument);
+    print(type);
+    print(content);
     return FirebaseFirestore.instance
         .collection('notification')
         .add(<String, dynamic>{

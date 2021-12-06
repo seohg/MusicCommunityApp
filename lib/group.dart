@@ -52,13 +52,14 @@ class GroupPageState extends State<GroupPage> {
   Future <List> distanceChecker() async{
     Location location = Location();
     LocationData _locationData;
+    print("jell");
 
     _locationData = await location.getLocation();
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection('band')
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
-    List tempData= [];
+    List tempData= ["<GROUP LIST>"];
 
     for(int i=0; i<allData.length;i++) {
       final Distance distance = new Distance();
@@ -68,10 +69,10 @@ class GroupPageState extends State<GroupPage> {
           new LatLng(loc[0],loc[1])
       );
       if(meter<10.0) {
-        tempData.add(allData[i]);
+        tempData.add(allData[i]['group_name'].toString());
       }
-      print(meter);
     }
+    print(tempData);
 
     return tempData;
 
@@ -95,6 +96,8 @@ class GroupPageState extends State<GroupPage> {
   final _secondaryController = TextEditingController();
   final _tertiaryController = TextEditingController();
   final _quaternaryController = TextEditingController();
+
+  ValueNotifier<String> initialValue=ValueNotifier<String>("<GROUP LIST>");
 
   @override
   Widget build(BuildContext context) {
@@ -761,14 +764,58 @@ class GroupPageState extends State<GroupPage> {
                                                                       FontWeight
                                                                           .bold),
                                                                 )),
-                                                            Padding(
-                                                              padding:
-                                                              EdgeInsets.all(
-                                                                  2.0),
-                                                              child: TextFormField(
-                                                                controller:
-                                                                _primaryController,
-                                                              ),
+                                                            FutureBuilder(
+                                                                future: distanceChecker(),
+                                                                builder: (BuildContext context, AsyncSnapshot url) {
+                                                                  if (url.hasData == false) {
+                                                                    return Container(
+                                                                        alignment:Alignment.center,
+                                                                        width: 150,
+                                                                        height: 48,
+                                                                        child: Text("Bringing Groups...")
+                                                                    );
+                                                                  } else if (url.hasError) {
+                                                                    return Padding(
+                                                                      padding: const EdgeInsets.all(8.0),
+                                                                      child: Text(
+                                                                        'Error: ${url.error}',
+                                                                        style: TextStyle(fontSize: 15),
+                                                                      ),
+                                                                    );
+                                                                  } else {
+                                                                    return
+                                                                      ValueListenableBuilder<String>(
+                                                                        builder: (BuildContext context, String vals, Widget? child) {
+                                                                          return DropdownButton<String>(
+                                                                            value: vals,
+                                                                            icon: const Icon(Icons.arrow_drop_down_sharp),
+                                                                            iconSize: 24,
+                                                                            elevation: 16,
+                                                                            style: const TextStyle(
+                                                                              color: Colors.black,
+                                                                            ),
+                                                                            underline: Container(
+                                                                              height: 2,
+                                                                              color: Colors.black,
+                                                                            ),
+                                                                            onChanged: (String? newValue) {
+                                                                              setState(() {
+                                                                                initialValue.value = newValue!;
+                                                                              });
+                                                                            },
+                                                                            items: url.data.map<DropdownMenuItem<String>>((value) {
+                                                                              return DropdownMenuItem<String>(
+                                                                                value: value,
+                                                                                child: Text(value),
+                                                                              );
+                                                                            }).toList(),
+
+                                                                          );
+                                                                        },
+                                                                        valueListenable: initialValue,
+                                                                      );
+                                                                  }
+                                                                }
                                                             ),
                                                             Padding(
                                                                 padding:
@@ -791,48 +838,6 @@ class GroupPageState extends State<GroupPage> {
                                                                 _secondaryController,
                                                               ),
                                                             ),
-
-                                                            /*ValueListenableBuilder<String>(
-                                              builder: (BuildContext context, String vals, Widget? child) {
-                                                return DropdownButton<String>(
-                                                  value: vals,
-                                                  icon: const Icon(Icons.arrow_drop_down_sharp),
-                                                  iconSize: 24,
-                                                  elevation: 16,
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                  ),
-                                                  underline: Container(
-                                                    height: 2,
-                                                    color: Colors.black,
-                                                  ),
-                                                  onChanged: (String? newValue) {
-                                                    setState(() {
-                                                      va.value = newValue!;
-
-                                                    });
-                                                  },IconButton(
-            icon: Icon(
-              Icons.refresh,
-              semanticLabel: 'refresh',
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NotificationPage()));
-            },
-          ),
-                                                  items: valcol.map<DropdownMenuItem<String>>((value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value,
-                                                      child: Text(value),
-                                                    );
-                                                  }).toList(),
-
-                                                );
-                                              },
-                                              valueListenable: va,
-                                            ),*/
                                                             Padding(
                                                                 padding:
                                                                 EdgeInsets.all(
@@ -867,11 +872,9 @@ class GroupPageState extends State<GroupPage> {
                                                                 child: Text(
                                                                     "Send"),
                                                                 onPressed: () {
-                                                                  appState
-                                                                      .groupRequest(
+                                                                  appState.groupRequest(
                                                                       "join",
-                                                                      _primaryController
-                                                                          .text,
+                                                                      initialValue.value,
                                                                       _secondaryController
                                                                           .text,
                                                                       _tertiaryController
@@ -887,21 +890,6 @@ class GroupPageState extends State<GroupPage> {
                                                                 },
                                                               ),
                                                             ),
-                                              Padding(
-                                                padding:
-                                                const EdgeInsets
-                                                    .all(
-                                                    1.0),
-                                                child: RaisedButton(
-                                                  child: Text(
-                                                      "Send"),
-                                                  onPressed: () {
-                                                    distanceChecker();
-                                                    Navigator.pop(
-                                                        context);
-                                                  },
-                                                ),),
-
                                                           ],
                                                         ),
                                                         ),
