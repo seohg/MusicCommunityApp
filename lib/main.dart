@@ -66,6 +66,7 @@ class ApplicationState extends ChangeNotifier {
   Location location = new Location();
   bool _serviceEnabled = false;
   PermissionStatus _permissionGranted = PermissionStatus.denied;
+  late String gen = "";
 
   ApplicationState() {
     init();
@@ -155,12 +156,23 @@ class ApplicationState extends ChangeNotifier {
                 imageUrl: document.data()['imageUrl'] as String,
                 songUrl: document.data()['songUrl'] as String,
                 title: document.data()['title'] as String,
+                genre: document.data()['genre'] as String,
               ),
             );
             FirebaseFirestore.instance.collection('music').doc(document.id).update({'id': document.id,});
           }
           notifyListeners();
         });
+        _userSubscription = FirebaseFirestore.instance
+            .collection('music')
+            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+            .snapshots()
+            .listen((snapshot) {
+          for (final document in snapshot.docs) {
+            gen =  document.data()['genre'] as String;
+          }
+
+          });
 
         // to here
       } else {
@@ -175,6 +187,8 @@ class ApplicationState extends ChangeNotifier {
         _musicSubscription?.cancel();
         _EventList=[];
         _eventSubscription?.cancel();
+        _userList=[];
+        _userSubscription?.cancel();
       }
       notifyListeners();
     });
@@ -187,6 +201,7 @@ class ApplicationState extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? _commentSubscription;
   StreamSubscription<QuerySnapshot>? _eventSubscription;
   StreamSubscription<QuerySnapshot>? _musicSubscription;
+  StreamSubscription<QuerySnapshot>? _userSubscription;
   List<Product> _productMessages = [];
   List<Product> get productMessages => _productMessages;
   List<Mess> _messMessages = [];
@@ -197,6 +212,8 @@ class ApplicationState extends ChangeNotifier {
   List<Event> get EventList => _EventList;
   List<Music> _musicList = [];
   List<Music> get musicList => _musicList;
+  List<Music> _userList = [];
+  List<Music> get userList => _userList;
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -655,5 +672,12 @@ class ApplicationState extends ChangeNotifier {
       'hour':hour,
       'min':min,
     });
+  }
+  Future<void> getUserGen() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    gen= allData[0]['genre'];
+    notifyListeners();
   }
 }

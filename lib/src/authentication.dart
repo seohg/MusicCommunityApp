@@ -148,6 +148,7 @@ class Authentication extends StatelessWidget {
             'loc': "",
             'long': 0,
             'lat': 0,
+            'genre':"pop",
           });
           }else {
             FirebaseFirestore.instance

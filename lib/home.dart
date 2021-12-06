@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile_tmp.dart';
+import 'package:modu/profile.dart';
 import 'package:modu/src/authentication.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +29,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   CollectionReference _collectionRef =
   FirebaseFirestore.instance.collection('product');
+  late String gen="";
+
+
 
   Future<List> getBoardData(int num) async {
     // Get docs from collection reference
@@ -111,9 +114,13 @@ class _MyHomePageState extends State<MyHomePage> {
   late List<DocumentSnapshot> snap;
   int check = 0;
 
-  Future<List> _randomMusic(int num) async {
+  Future<List> _randomMusic(int num, String tmp) async {
+    print("here");
+    print(tmp);
     final QuerySnapshot result =
-    await FirebaseFirestore.instance.collection('music').get();
+    await FirebaseFirestore.instance
+        .collection('music').where('genre', isEqualTo:tmp).get();
+
     final List<DocumentSnapshot> documents = result.docs;
     if (check == 0) {
       documents.shuffle();
@@ -127,9 +134,16 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return fin;
   }
+  Future<void> getUserGen() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    gen= allData[0]['genre'];
+  }
 
   @override
   Widget build(BuildContext context) {
+    getUserGen();
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -1087,15 +1101,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              Container(
+          Consumer<ApplicationState>(
+            builder: (context, appState, _) =>Container(
                 margin: EdgeInsets.symmetric(vertical: 20.0),
                 height: 170.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
+
                     SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(0),
+                FutureBuilder(
+                        future: _randomMusic(0,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1155,67 +1171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(1),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                border: Border.all(
-                                  color: Colors.white,
-                                ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
-                                ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
-                                  ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(2),
+                        future: _randomMusic(1,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1275,7 +1231,67 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(3),
+                        future: _randomMusic(2,gen),
+                        builder: (BuildContext context, AsyncSnapshot url) {
+                          if (url.hasData == false) {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            );
+                          } else if (url.hasError) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Error: ${url.error}',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 115.0,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: 8),
+                                  Container(
+                                    height: 100,
+                                    child: Image.network(url.data[1]),
+                                  ),
+                                  //Image.network(url.data[1]),
+                                  SizedBox(height: 10),
+                                  Text(url.data[2],
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                    url.data[0],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        }),
+                    SizedBox(width: 10),
+                    FutureBuilder(
+                        future: _randomMusic(3,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1335,7 +1351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(4),
+                        future: _randomMusic(4,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1398,7 +1414,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     SizedBox(width: 10),
                   ],
                 ),
-              ),
+              ),),
             ],
           ),
         ),
