@@ -13,6 +13,7 @@ import 'model/event.dart';
 import 'src/authentication.dart';
 import 'package:location/location.dart';
 import 'package:intl/intl.dart';
+import 'package:latlng/latlng.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -66,7 +67,6 @@ class ApplicationState extends ChangeNotifier {
   Location location = new Location();
   bool _serviceEnabled = false;
   PermissionStatus _permissionGranted = PermissionStatus.denied;
-  late String gen = "";
 
   ApplicationState() {
     init();
@@ -163,16 +163,6 @@ class ApplicationState extends ChangeNotifier {
           }
           notifyListeners();
         });
-        _userSubscription = FirebaseFirestore.instance
-            .collection('music')
-            .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-            .snapshots()
-            .listen((snapshot) {
-          for (final document in snapshot.docs) {
-            gen =  document.data()['genre'] as String;
-          }
-
-          });
 
         // to here
       } else {
@@ -187,8 +177,6 @@ class ApplicationState extends ChangeNotifier {
         _musicSubscription?.cancel();
         _EventList=[];
         _eventSubscription?.cancel();
-        _userList=[];
-        _userSubscription?.cancel();
       }
       notifyListeners();
     });
@@ -201,7 +189,6 @@ class ApplicationState extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? _commentSubscription;
   StreamSubscription<QuerySnapshot>? _eventSubscription;
   StreamSubscription<QuerySnapshot>? _musicSubscription;
-  StreamSubscription<QuerySnapshot>? _userSubscription;
   List<Product> _productMessages = [];
   List<Product> get productMessages => _productMessages;
   List<Mess> _messMessages = [];
@@ -212,8 +199,6 @@ class ApplicationState extends ChangeNotifier {
   List<Event> get EventList => _EventList;
   List<Music> _musicList = [];
   List<Music> get musicList => _musicList;
-  List<Music> _userList = [];
-  List<Music> get userList => _userList;
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -505,8 +490,7 @@ class ApplicationState extends ChangeNotifier {
     LocationData _locationData;
 
     _locationData = await location.getLocation();
-
-
+    var loc_list =[_locationData.latitude!.toDouble(),_locationData.longitude!.toDouble()];
 
     return FirebaseFirestore.instance
         .collection('band')
@@ -515,7 +499,7 @@ class ApplicationState extends ChangeNotifier {
       'captain_name': FirebaseAuth.instance.currentUser!.displayName,
       'group_genre':groupGenre,
       'group_name':groupName,
-      'loc': _locationData.toString(),
+      'loc': loc_list,
       'description':description,
     });
   }
@@ -523,6 +507,13 @@ class ApplicationState extends ChangeNotifier {
 
   Future<DocumentReference?> groupRequest(String type, String email, String instrument, String content) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('band')
+        .where("group_name", isEqualTo: email)
+        .get();
+    List tempData = query.docs.map((doc) => doc.data()).toList();
+    var tempEmail = tempData[0]['captain_email'];
+
     String groupEmail;
     if(email=="empty") {
       QuerySnapshot query = await FirebaseFirestore.instance
@@ -533,9 +524,12 @@ class ApplicationState extends ChangeNotifier {
       groupEmail =allData[0]['captain_email'].toString();
     }
     else
-      groupEmail=email;
+      groupEmail=tempEmail;
 
-
+    print(groupEmail);
+    print(instrument);
+    print(type);
+    print(content);
     return FirebaseFirestore.instance
         .collection('notification')
         .add(<String, dynamic>{
@@ -672,12 +666,5 @@ class ApplicationState extends ChangeNotifier {
       'hour':hour,
       'min':min,
     });
-  }
-  Future<void> getUserGen() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
-    List allData = quer.docs.map((doc) => doc.data()).toList();
-    gen= allData[0]['genre'];
-    notifyListeners();
   }
 }

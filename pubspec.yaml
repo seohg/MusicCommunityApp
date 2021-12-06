@@ -25,6 +25,8 @@ dependencies:
   table_calendar: ^3.0.3
   flutter_datetime_picker: ^1.5.1
   firebase_messaging: ^11.2.0
+  latlong: ^0.6.1
+  latlng: any
 
 
 dev_dependencies:
