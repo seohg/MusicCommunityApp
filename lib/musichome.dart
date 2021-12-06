@@ -49,12 +49,15 @@ class MusicHomePageState extends State<MusicHomePage> {
               aspectRatio: 18 / 11,
               child: ClipRRect(
                 borderRadius:BorderRadius.circular(8.0),
-                child: Image.network(music.imageUrl),
+                child: Image.network(
+                  music.imageUrl,
+                  fit: BoxFit.contain,
+                  width: 100,),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(2.0, 4.0, 10.0, 2.0),
+                padding: const EdgeInsets.fromLTRB(15.0, 10.0, 10.0, 10.0),
                 child: Expanded(
                   child:Row(
                     children:<Widget>[
@@ -69,7 +72,7 @@ class MusicHomePageState extends State<MusicHomePage> {
                               music.title,
                               maxLines: 2,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -78,7 +81,7 @@ class MusicHomePageState extends State<MusicHomePage> {
                               maxLines: 2,
                               style: TextStyle(
                                 fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
                             Expanded(
@@ -93,6 +96,7 @@ class MusicHomePageState extends State<MusicHomePage> {
                                     child: const Text('listen',
                                       style : TextStyle(
                                         fontSize: 8,
+                                        color: Colors.black,
                                       ),
                                     ),
 
@@ -216,29 +220,35 @@ class MusicDetailPageState extends State<MusicDetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:  <Widget>[
-                      Image.network(music.imageUrl),
+                      Image.network(
+                        music.imageUrl,
+                        fit: BoxFit.fitWidth,
+                        width:320,
+                        ),
+                      Divider(),
                       Text(music.title,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color:Colors.blue,
+                          color:Colors.black,
                         ),
                       ),
                       Padding(
-                        padding:EdgeInsets.only(right:15),
+                        padding:EdgeInsets.only(top:15),
                       ),
                       Text(music.artist,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color:Colors.blue,
+                          color:Colors.black,
                         ),
+                      ),
+                      Padding(
+                        padding:EdgeInsets.only(top:30),
                       ),
                       Row(
                           children:  <Widget>[
-                            SizedBox(
-                              width:100,
-                            ),
+
                             Expanded(
                                 child: IconButton(
                                   icon: Icon(Icons.play_arrow),

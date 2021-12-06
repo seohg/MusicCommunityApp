@@ -56,7 +56,9 @@ class BoardPageState extends State<BoardPage> {
                     children:<Widget>[
                       Expanded(
                         flex:7,
-                        child: Column(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+                          child: Column(
                           // TODO: Align labels to the bottom and center (103)
                           crossAxisAlignment: CrossAxisAlignment.start,
                           // TODO: Change innermost Column (103)
@@ -65,21 +67,26 @@ class BoardPageState extends State<BoardPage> {
                               product.title,
                               maxLines: 2,
                               style: TextStyle(
+                                height: 1.2,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text(
-                              product.contents,
-                              maxLines: 4,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                            Divider(),
+                            SizedBox(
+                              height:80,
+                              child:Text(
+                                product.contents,
+                                maxLines: 4,
+                                style: TextStyle(
+                                  height: 1.5,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
 
-                            Expanded(
-                              child:Row(
+                            Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children:  <Widget>[
                                   TextButton(
@@ -105,8 +112,9 @@ class BoardPageState extends State<BoardPage> {
                                   ),
                                 ],
                               ),
-                            ),
+
                           ],
+                        ),
                         ),
                       ),
 
@@ -337,129 +345,143 @@ class DetailPageState extends State<DetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:  <Widget>[
-
-                      Padding(
-                        padding:EdgeInsets.only(top:10),
-                      ),
-
-                      Padding(
-                        padding:EdgeInsets.only(top:15),
-                      ),
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children:  <Widget>[
-                          Text(product.title,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color:Colors.blue,
+                          SizedBox(
+                            height:20,
+                            child:Text(
+                              product.title,
+                              maxLines: 10,
+                              textAlign: TextAlign.left ,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color:Colors.black,
+                              ),
                             ),
                           ),
-                          Padding(
-                            padding:EdgeInsets.only(right:15),
-                          ),
+                          Divider(),
+
                           Text(product.contents,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color:Colors.blue,
+                              color:Colors.black,
                             ),
+                          ),
+                          Padding(
+                            padding:EdgeInsets.only(top:10),
+                          ),
+                          const Divider(
+                            height:1.0,
+                            color:Colors.black,
+                          ),
+                          Row(
+                            //mainAxisAlignment: MainAxisAlignment.start,
+                            children:  <Widget>[
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width-60,  // or use fixed size like 200
+                                height: 200,
+                                child: GoogleMap(
+                                  mapType: MapType.normal,
+                                  markers: Set.from(_markers),
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(37.4219892, -122.0840018),
+                                    zoom: 14.4746,
+                                  ),
+                                  onCameraMove: (_) {},
+                                  myLocationButtonEnabled: false,
+                                ),),
+                            ],
                           ),
                           Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                             children:  <Widget>[
-                              IconButton(
-                            icon: Icon(Icons.thumb_up),
-                            color: Colors.red,
-                            iconSize: 30.0,
-                            onPressed: () {
-                              FirebaseFirestore.instance
-                                  .collection('product')
-                                  .doc(product.id)
-                                  .get()
-                                  .then((doc){
-                                List like = doc.get('likeList') as List;
-                                like.contains(FirebaseAuth.instance.currentUser!.uid)
-                                    ? liked = true
-                                    : liked = false;
-                              });
-                              List<String> union = [
-                                FirebaseAuth.instance.currentUser!.uid,
-                              ];
-                              if (liked == false){
-                                FirebaseFirestore.instance
-                                    .collection('product')
-                                    .doc(product.id)
-                                    .update({'likeList': FieldValue.arrayUnion(union),
-                                });
-                                count = count + 1;
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('I LIKE IT!')));
-                              }else{
-                                count = count;
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You can only do it once!!')));
-
-                              }
-                            },
-                          ),
-                          Text(count==null?'0':'${count}',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color:Colors.blue,
-                            ),
-                          ),
-                              Padding(
-                                padding:EdgeInsets.only(right:50),
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:  <Widget>[
+                                    Text('creator${product.UID}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color:Colors.grey,
+                                      ),
+                                    ),
+                                    Text('${product.create.toDate()} created',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color:Colors.grey,
+                                      ),
+                                    ),
+                                    Text('${product.update.toDate()} modified',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color:Colors.grey,
+                                      ),
+                                    ),
+                                  ],
                               ),
+                              Padding(
+                                padding:EdgeInsets.only(right:60),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.thumb_up),
+                                color: Colors.red,
+                                iconSize: 20.0,
+                                onPressed: () {
+                                  FirebaseFirestore.instance
+                                      .collection('product')
+                                      .doc(product.id)
+                                      .get()
+                                      .then((doc){
+                                    List like = doc.get('likeList') as List;
+                                    like.contains(FirebaseAuth.instance.currentUser!.uid)
+                                        ? liked = true
+                                        : liked = false;
+                                  });
+                                  List<String> union = [
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                  ];
+                                  if (liked == false){
+                                    FirebaseFirestore.instance
+                                        .collection('product')
+                                        .doc(product.id)
+                                        .update({'likeList': FieldValue.arrayUnion(union),
+                                    });
+                                    count = count + 1;
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('I LIKE IT!')));
+                                  }else{
+                                    count = count;
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You can only do it once!!')));
+
+                                  }
+                                },
+                              ),
+                              Text(count==null?'0':'${count}',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color:Colors.black,
+                                ),
+                              ),
+
 
                             ],
                           ),
                         ],
                       ),
-                      Padding(
-                        padding:EdgeInsets.only(top:10),
-                      ),
-                      Padding(
-                        padding:EdgeInsets.only(top:10),
-                      ),
-                      const Divider(
-                        height:1.0,
-                        color:Colors.black,
-                      ),
-                      Padding(
-                        padding:EdgeInsets.only(top:10),
-                      ),
 
                       Padding(
                         padding:EdgeInsets.only(top:10),
                       ),
-                      Text('creator${product.UID}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color:Colors.grey,
-                        ),
-                      ),
-                      Text('${product.create.toDate()} created',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color:Colors.grey,
-                        ),
-                      ),
-                      Text('${product.update.toDate()} modified',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color:Colors.grey,
-                        ),
-                      ),
                       Row(
-                        //mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children:  <Widget>[
                           Container(
-                            width:260,
-                            margin: EdgeInsets.all(12),
+                            width:280,
                             child: TextField(
                               controller: _commentController,
                               decoration: InputDecoration(
@@ -481,31 +503,13 @@ class DetailPageState extends State<DetailPage> {
                           )
                         ],
                       ),
-                    Row(
-                      //mainAxisAlignment: MainAxisAlignment.start,
-                      children:  <Widget>[
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width-100,  // or use fixed size like 200
-                          height: 200,
-                          child: GoogleMap(
-                          mapType: MapType.normal,
-                          markers: Set.from(_markers),
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(37.4219892, -122.0840018),
-                            zoom: 14.4746,
-                          ),
-                          onCameraMove: (_) {},
-                          myLocationButtonEnabled: false,
-                        ),),
-                        ],
-                      ),
+
 
                       ExpansionTile(
                         leading: Icon(Icons.comment),
                         title: Text("Comments"),
                         onExpansionChanged:(bool expanded){
                           setState(() {
-
                             appState.loadComment(product.id);
                             comments = appState.commentList;
                             showComments = expanded;
@@ -522,7 +526,6 @@ class DetailPageState extends State<DetailPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-
                                   Text(
                                     comments[idx].username,
                                     style:TextStyle(
