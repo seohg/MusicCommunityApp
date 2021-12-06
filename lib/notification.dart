@@ -121,9 +121,7 @@ class NotificationPageState extends State<NotificationPage> {
                         width: 115.0,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
-                          border: Border.all(
-                            color: Colors.white,
-                          ),
+
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       );
@@ -141,14 +139,14 @@ class NotificationPageState extends State<NotificationPage> {
                         for (var i = 0; i < url.data.length; i++)
                           Container(
                             width: 400.0,
-                            margin: EdgeInsets.all(5),
+                            margin: EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: Colors.white,
                               border: Border.all(
-                                color: Colors.white,
+                                width: 2,
+                                color: Colors.black,
                               ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                              borderRadius: BorderRadius.all(Radius.circular(2)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -158,7 +156,7 @@ class NotificationPageState extends State<NotificationPage> {
                                     url.data[i]['sender_email'],
                                     url.data[i]['type'],
                                     url.data[i]['instrument'],
-                                )),
+                                ), textAlign: TextAlign.center,),
                                 Text(
                                   url.data[i]['content'],
                                   style: TextStyle(

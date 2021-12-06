@@ -38,11 +38,8 @@ class FriendsPageState extends State<FriendsPage> {
             Navigator.pop(context);
           },
         ),
-
         actions: <Widget>[
         ],
-
-
       ),
 
       body: Center(
@@ -60,14 +57,14 @@ class FriendsPageState extends State<FriendsPage> {
                               height: 400,
                               margin: EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: Colors.grey,
                                 border: Border.all(
-                                  color: Colors.white,
+                                  color: Colors.grey,
                                 ),
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(10)),
                               ),
-                              child: Text("BRINGING LIST OF FRIENDS!!",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
+                              child: Text("",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center));
                         } else if (url.hasError) {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -79,18 +76,16 @@ class FriendsPageState extends State<FriendsPage> {
                         } else {
                           return Column(
                               children: [
-                                SizedBox(height:10),
+
 
                                 for (var i = 0; i < url.data.length; i++) Container(
-                                  width: 400.0,
-                                  margin: EdgeInsets.all(5),
+                                  width: double.infinity,
+                                  //margin: EdgeInsets.all(1),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[300],
+                                    color: Colors.white,
                                     border: Border.all(
-                                      color: Colors.white,
+                                      color: Colors.grey,
                                     ),
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,

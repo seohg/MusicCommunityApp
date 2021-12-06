@@ -13,6 +13,7 @@ import 'model/event.dart';
 import 'src/authentication.dart';
 import 'package:location/location.dart';
 import 'package:intl/intl.dart';
+import 'package:latlng/latlng.dart';
 
 void main() {
   //Firebase.initializeApp();
@@ -488,8 +489,7 @@ class ApplicationState extends ChangeNotifier {
     LocationData _locationData;
 
     _locationData = await location.getLocation();
-
-
+    var loc_list =[_locationData.latitude!.toDouble(),_locationData.longitude!.toDouble()];
 
     return FirebaseFirestore.instance
         .collection('band')
@@ -498,7 +498,7 @@ class ApplicationState extends ChangeNotifier {
       'captain_name': FirebaseAuth.instance.currentUser!.displayName,
       'group_genre':groupGenre,
       'group_name':groupName,
-      'loc': _locationData.toString(),
+      'loc': loc_list,
       'description':description,
     });
   }
