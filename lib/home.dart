@@ -115,8 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int check = 0;
 
   Future<List> _randomMusic(int num, String tmp) async {
-    print("here");
-    print(tmp);
     final QuerySnapshot result =
     await FirebaseFirestore.instance
         .collection('music').where('genre', isEqualTo:tmp).get();
@@ -134,6 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return fin;
   }
+
   Future<void> getUserGen() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
