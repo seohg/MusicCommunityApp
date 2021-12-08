@@ -156,6 +156,7 @@ class ApplicationState extends ChangeNotifier {
                 imageUrl: document.data()['imageUrl'] as String,
                 songUrl: document.data()['songUrl'] as String,
                 title: document.data()['title'] as String,
+                genre: document.data()['genre'] as String,
               ),
             );
             FirebaseFirestore.instance.collection('music').doc(document.id).update({'id': document.id,});

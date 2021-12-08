@@ -2,7 +2,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile_tmp.dart';
+import 'package:modu/profile.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'model/music.dart';
@@ -212,11 +212,17 @@ class MusicDetailPageState extends State<MusicDetailPage> {
       ),
 
       body: Consumer<ApplicationState>(
-        builder: (context, appState, _) =>ListView(
+
+        builder: (context, appState, _) =>Container(
+            color: Colors.black,
+            child:ListView(
+
             children: [
               Padding(
+
                 padding:EdgeInsets.all(30),
                 child: Expanded(
+
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:  <Widget>[
@@ -230,7 +236,7 @@ class MusicDetailPageState extends State<MusicDetailPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color:Colors.black,
+                          color:Colors.white,
                         ),
                       ),
                       Padding(
@@ -240,7 +246,17 @@ class MusicDetailPageState extends State<MusicDetailPage> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color:Colors.black,
+                          color:Colors.white,
+                        ),
+                      ),
+                      Padding(
+                        padding:EdgeInsets.only(top:15),
+                      ),
+                      Text(music.genre,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color:Colors.grey,
                         ),
                       ),
                       Padding(
@@ -251,7 +267,8 @@ class MusicDetailPageState extends State<MusicDetailPage> {
 
                             Expanded(
                                 child: IconButton(
-                                  icon: Icon(Icons.play_arrow),
+                                  icon: Icon(Icons.play_arrow,
+                                  color:Colors.white),
                                   onPressed: () async {
                                     try {
                                       await _assetsAudioPlayer.open(
@@ -266,7 +283,8 @@ class MusicDetailPageState extends State<MusicDetailPage> {
                             ),
                             Expanded(
                               child: IconButton(
-                                icon: Icon(Icons.stop),
+                                icon: Icon(Icons.stop,
+                                    color:Colors.white),
                                 onPressed: () {
                                     _assetsAudioPlayer.stop();
                                 },
@@ -285,6 +303,7 @@ class MusicDetailPageState extends State<MusicDetailPage> {
               ),
             ]
         ),
+      ),
       ),
     );
   }

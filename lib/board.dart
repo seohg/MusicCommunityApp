@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile_tmp.dart';
+import 'package:modu/profile.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'model/product.dart';
@@ -63,13 +63,16 @@ class BoardPageState extends State<BoardPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           // TODO: Change innermost Column (103)
                           children:  <Widget>[
-                            Text(
-                              product.title,
-                              maxLines: 2,
-                              style: TextStyle(
-                                height: 1.2,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            SizedBox(
+                            height:24,
+                            child:Text(
+                                product.title,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  height: 1.2,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             Divider(),
@@ -251,6 +254,8 @@ class DetailPageState extends State<DetailPage> {
   List<Marker> _markers = [];
 
   DetailPageState(Product product){
+    lat = 0;
+    long = 0;
     this.product = product;
     likeList = this.product.likeList;
     count = likeList.length;
@@ -377,24 +382,7 @@ class DetailPageState extends State<DetailPage> {
                             height:1.0,
                             color:Colors.black,
                           ),
-                          Row(
-                            //mainAxisAlignment: MainAxisAlignment.start,
-                            children:  <Widget>[
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width-60,  // or use fixed size like 200
-                                height: 200,
-                                child: GoogleMap(
-                                  mapType: MapType.normal,
-                                  markers: Set.from(_markers),
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(37.4219892, -122.0840018),
-                                    zoom: 14.4746,
-                                  ),
-                                  onCameraMove: (_) {},
-                                  myLocationButtonEnabled: false,
-                                ),),
-                            ],
-                          ),
+
                           Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                             children:  <Widget>[
@@ -469,6 +457,24 @@ class DetailPageState extends State<DetailPage> {
                               ),
 
 
+                            ],
+                          ),
+                          Row(
+                            //mainAxisAlignment: MainAxisAlignment.start,
+                            children:  <Widget>[
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width-120,  // or use fixed size like 200
+                                height: 120,
+                                child: GoogleMap(
+                                  mapType: MapType.normal,
+                                  markers: Set.from(_markers),
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(36.102163,129.390900),
+                                    zoom: 14.4746,
+                                  ),
+                                  onCameraMove: (_) {},
+                                  myLocationButtonEnabled: false,
+                                ),),
                             ],
                           ),
                         ],

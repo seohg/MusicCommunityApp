@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modu/profile_tmp.dart';
+import 'package:modu/profile.dart';
 import 'package:modu/src/authentication.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +28,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   CollectionReference _collectionRef =
-      FirebaseFirestore.instance.collection('product');
+  FirebaseFirestore.instance.collection('product');
+  late String gen="";
+
+
 
   Future<List> getBoardData(int num) async {
     // Get docs from collection reference
@@ -111,9 +114,13 @@ class _MyHomePageState extends State<MyHomePage> {
   late List<DocumentSnapshot> snap;
   int check = 0;
 
-  Future<List> _randomMusic(int num) async {
+  Future<List> _randomMusic(int num, String tmp) async {
+    print("here");
+    print(tmp);
     final QuerySnapshot result =
-        await FirebaseFirestore.instance.collection('music').get();
+    await FirebaseFirestore.instance
+        .collection('music').where('genre', isEqualTo:tmp).get();
+
     final List<DocumentSnapshot> documents = result.docs;
     if (check == 0) {
       documents.shuffle();
@@ -127,9 +134,16 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return fin;
   }
+  Future<void> getUserGen() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    gen= allData[0]['genre'];
+  }
 
   @override
   Widget build(BuildContext context) {
+    getUserGen();
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -279,12 +293,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               },
                               style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateProperty.all(Colors.white),
+                                  MaterialStateProperty.all(Colors.white),
                                   shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(14.0),
+                                          BorderRadius.circular(14.0),
                                           side: BorderSide(
                                               color: Colors.black))))),
                         ),
@@ -295,7 +309,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         SizedBox(width: 20),
                         Text(getEmail(),
                             style:
-                                TextStyle(fontSize: 12, color: Colors.white)),
+                            TextStyle(fontSize: 12, color: Colors.white)),
                       ],
                     ),
                     Row(
@@ -396,7 +410,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -416,7 +430,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,7 +475,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -481,7 +495,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,7 +540,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -546,7 +560,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +605,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -611,7 +625,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -656,7 +670,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -676,7 +690,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -746,8 +760,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 10.0,
+                                  offset: Offset(10.0, 5.0),
+                                  ),
+                                ],
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -767,7 +788,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -812,7 +833,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -832,7 +853,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -877,7 +898,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -897,7 +918,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -942,7 +963,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -962,7 +983,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1006,8 +1027,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
+
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1027,7 +1049,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1079,15 +1101,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              Container(
+          Consumer<ApplicationState>(
+            builder: (context, appState, _) =>Container(
                 margin: EdgeInsets.symmetric(vertical: 20.0),
                 height: 170.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
+
                     SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(0),
+                FutureBuilder(
+                        future: _randomMusic(0,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1098,7 +1122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1118,7 +1142,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1147,7 +1171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(1),
+                        future: _randomMusic(1,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1158,7 +1182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1178,7 +1202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1207,7 +1231,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(2),
+                        future: _randomMusic(2,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1218,7 +1242,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1238,7 +1262,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1267,7 +1291,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(3),
+                        future: _randomMusic(3,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1278,7 +1302,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1298,7 +1322,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Colors.white,
                                 ),
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1327,7 +1351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         }),
                     SizedBox(width: 10),
                     FutureBuilder(
-                        future: _randomMusic(4),
+                        future: _randomMusic(4,gen),
                         builder: (BuildContext context, AsyncSnapshot url) {
                           if (url.hasData == false) {
                             return Container(
@@ -1337,8 +1361,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
                               ),
                             );
                           } else if (url.hasError) {
@@ -1356,9 +1380,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 color: Colors.grey[300],
                                 border: Border.all(
                                   color: Colors.white,
+
                                 ),
+
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
+                                BorderRadius.all(Radius.circular(10)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1388,7 +1414,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     SizedBox(width: 10),
                   ],
                 ),
-              ),
+              ),),
             ],
           ),
         ),
