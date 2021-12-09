@@ -22,6 +22,7 @@ class FriendsPageState extends State<FriendsPage> {
 
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,6 +165,7 @@ class FriendsPageState extends State<FriendsPage> {
                               ],
                             ),
                       ),
+
                     ],
                   ),
                 );

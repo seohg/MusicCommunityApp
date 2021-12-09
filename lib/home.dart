@@ -115,8 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int check = 0;
 
   Future<List> _randomMusic(int num, String tmp) async {
-    print("here");
-    print(tmp);
     final QuerySnapshot result =
     await FirebaseFirestore.instance
         .collection('music').where('genre', isEqualTo:tmp).get();
@@ -128,12 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
       check = 1;
     }
     List fin = [
-      snap[num]["artist"].toString(),
-      snap[num]["imageUrl"].toString(),
-      snap[num]["title"].toString(),
+      documents[num]["artist"].toString(),
+      documents[num]["imageUrl"].toString(),
+      documents[num]["title"].toString(),
     ];
     return fin;
   }
+
   Future<void> getUserGen() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid).get();
@@ -760,11 +759,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: Border.all(
                                   color: Colors.white,
                                 ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 10.0,
-                                  offset: Offset(10.0, 5.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 10.0,
+                                    offset: Offset(10.0, 5.0),
                                   ),
                                 ],
                                 borderRadius:
@@ -1101,320 +1100,320 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-          Consumer<ApplicationState>(
-            builder: (context, appState, _) =>Container(
-                margin: EdgeInsets.symmetric(vertical: 20.0),
-                height: 170.0,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
+              Consumer<ApplicationState>(
+                builder: (context, appState, _) =>Container(
+                  margin: EdgeInsets.symmetric(vertical: 20.0),
+                  height: 170.0,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
 
-                    SizedBox(width: 10),
-                FutureBuilder(
-                        future: _randomMusic(0,gen),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
-                                ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
-                                ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
+                      SizedBox(width: 10),
+                      FutureBuilder(
+                          future: _randomMusic(0,gen),
+                          builder: (BuildContext context, AsyncSnapshot url) {
+                            if (url.hasData == false) {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
                                   ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(1,gen),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                border: Border.all(
-                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
+                              );
+                            } else if (url.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Error: ${url.error}',
+                                  style: TextStyle(fontSize: 15),
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
+                              );
+                            } else {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
                                   ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(2,gen),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                border: Border.all(
-                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Container(
+                                      height: 100,
+                                      child: Image.network(url.data[1]),
+                                    ),
+                                    //Image.network(url.data[1]),
+                                    SizedBox(height: 10),
+                                    Text(url.data[2],
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    Text(
+                                      url.data[0],
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
+                              );
+                            }
+                          }),
+                      SizedBox(width: 10),
+                      FutureBuilder(
+                          future: _randomMusic(1,gen),
+                          builder: (BuildContext context, AsyncSnapshot url) {
+                            if (url.hasData == false) {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  border: Border.all(
+                                    color: Colors.white,
                                   ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(3,gen),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
+                              );
+                            } else if (url.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Error: ${url.error}',
+                                  style: TextStyle(fontSize: 15),
                                 ),
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
+                              );
+                            } else {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
                                   ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                    FutureBuilder(
-                        future: _randomMusic(4,gen),
-                        builder: (BuildContext context, AsyncSnapshot url) {
-                          if (url.hasData == false) {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                border: Border.all(
-                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                                 ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Container(
+                                      height: 100,
+                                      child: Image.network(url.data[1]),
+                                    ),
+                                    //Image.network(url.data[1]),
+                                    SizedBox(height: 10),
+                                    Text(url.data[2],
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    Text(
+                                      url.data[0],
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          }),
+                      SizedBox(width: 10),
+                      FutureBuilder(
+                          future: _randomMusic(2,gen),
+                          builder: (BuildContext context, AsyncSnapshot url) {
+                            if (url.hasData == false) {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                              );
+                            } else if (url.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Error: ${url.error}',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Container(
+                                      height: 100,
+                                      child: Image.network(url.data[1]),
+                                    ),
+                                    //Image.network(url.data[1]),
+                                    SizedBox(height: 10),
+                                    Text(url.data[2],
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    Text(
+                                      url.data[0],
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          }),
+                      SizedBox(width: 10),
+                      FutureBuilder(
+                          future: _randomMusic(3,gen),
+                          builder: (BuildContext context, AsyncSnapshot url) {
+                            if (url.hasData == false) {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                              );
+                            } else if (url.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Error: ${url.error}',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
+                                  ),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Container(
+                                      height: 100,
+                                      child: Image.network(url.data[1]),
+                                    ),
+                                    //Image.network(url.data[1]),
+                                    SizedBox(height: 10),
+                                    Text(url.data[2],
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    Text(
+                                      url.data[0],
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          }),
+                      SizedBox(width: 10),
+                      FutureBuilder(
+                          future: _randomMusic(4,gen),
+                          builder: (BuildContext context, AsyncSnapshot url) {
+                            if (url.hasData == false) {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                  ),
 
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
-                              ),
-                            );
-                          } else if (url.hasError) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Error: ${url.error}',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 115.0,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                border: Border.all(
-                                  color: Colors.white,
-
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
                                 ),
+                              );
+                            } else if (url.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Error: ${url.error}',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 115.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  border: Border.all(
+                                    color: Colors.white,
 
-                                borderRadius:
-                                BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: 8),
-                                  Container(
-                                    height: 100,
-                                    child: Image.network(url.data[1]),
                                   ),
-                                  //Image.network(url.data[1]),
-                                  SizedBox(height: 10),
-                                  Text(url.data[2],
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                    url.data[0],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              ),),
+
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 8),
+                                    Container(
+                                      height: 100,
+                                      child: Image.network(url.data[1]),
+                                    ),
+                                    //Image.network(url.data[1]),
+                                    SizedBox(height: 10),
+                                    Text(url.data[2],
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center),
+                                    Text(
+                                      url.data[0],
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          }),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),),
             ],
           ),
         ),

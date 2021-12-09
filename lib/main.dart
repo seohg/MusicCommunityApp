@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -501,21 +502,37 @@ class ApplicationState extends ChangeNotifier {
       'group_name':groupName,
       'loc': loc_list,
       'description':description,
+      'image' : "none",
     });
+  }
+
+
+
+
+
+  Future <String> imageUrl() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection('group')
+        .where("user_email", isEqualTo: auth.currentUser!.email)
+        .get();
+    List allData = query.docs.map((doc) => doc.data()).toList();
+    String name = allData[0]["group_name"];
+
+    final refe = FirebaseStorage.instance.ref().child(name + '.jpg');
+    var imgUrl = await refe.getDownloadURL();
+
+    print(imgUrl);
+    return imgUrl;
   }
 
 
   Future<DocumentReference?> groupRequest(String type, String email, String instrument, String content) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
-    QuerySnapshot query = await FirebaseFirestore.instance
-        .collection('band')
-        .where("group_name", isEqualTo: email)
-        .get();
-    List tempData = query.docs.map((doc) => doc.data()).toList();
-    var tempEmail = tempData[0]['captain_email'];
-
     String groupEmail;
-    if(email=="empty") {
+
+    if(type=="edit") {
       QuerySnapshot query = await FirebaseFirestore.instance
           .collection('group')
           .where("user_email", isEqualTo: auth.currentUser!.email)
@@ -523,13 +540,23 @@ class ApplicationState extends ChangeNotifier {
       List allData = query.docs.map((doc) => doc.data()).toList();
       groupEmail =allData[0]['captain_email'].toString();
     }
-    else
-      groupEmail=tempEmail;
+    else if (type=="join"){
+      QuerySnapshot query = await FirebaseFirestore.instance
+          .collection('band')
+          .where("group_name", isEqualTo: email)
+          .get();
+      List tempData = query.docs.map((doc) => doc.data()).toList();
+      groupEmail = tempData[0]['captain_email'];
+    }
+    else {
+      QuerySnapshot query = await FirebaseFirestore.instance
+          .collection('group')
+          .where("user_email", isEqualTo: auth.currentUser!.email)
+          .get();
+      List allData = query.docs.map((doc) => doc.data()).toList();
+      groupEmail =allData[0]['captain_email'].toString();
+    }
 
-    print(groupEmail);
-    print(instrument);
-    print(type);
-    print(content);
     return FirebaseFirestore.instance
         .collection('notification')
         .add(<String, dynamic>{
@@ -541,6 +568,8 @@ class ApplicationState extends ChangeNotifier {
       'content':content,
     });
   }
+
+
 
 
   Future<DocumentReference> newmessage(String recepient, String content) async {
@@ -603,6 +632,33 @@ class ApplicationState extends ChangeNotifier {
       'lat':tmploc.latitude,
     });
     //notifyListeners();
+  }
+  Future<List> getMusic() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    List newL= [];
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    newL.add(allData[0]['instrument']);
+    String ins= allData[0]['captain_email'];
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('band').where("captain_email", isEqualTo: ins).get();
+    List fullData = query.docs.map((doc) => doc.data()).toList();
+    newL.add(fullData[0]['group_genre']);
+    QuerySnapshot querys = await FirebaseFirestore.instance.collection('user').where("email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List fulData = querys.docs.map((doc) => doc.data()).toList();
+    newL.add(fulData[0]['genre']);
+    print(newL);
+    return newL;
+  }
+
+  Future<List> getGroup() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('group').where("user_email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+    String ins= allData[0]['captain_email'];
+    QuerySnapshot query = await FirebaseFirestore.instance.collection('band').where("captain_email", isEqualTo: ins).get();
+    List fullData = query.docs.map((doc) => doc.data()).toList();
+
+    return fullData;
   }
 
   Future<String> getInstrument() async {
