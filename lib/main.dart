@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'model/mess.dart';
 import 'model/music.dart';
@@ -405,7 +407,6 @@ class ApplicationState extends ChangeNotifier {
         temp[i].removeWhere((key, value) => key == "userid");
         temp[i].removeWhere((key, value) => key == "title");
         temp[i].removeWhere((key, value) => key == "date");
-        print(temp[i]);
         allData.add(temp[i]);
       }
     }
@@ -523,12 +524,13 @@ class ApplicationState extends ChangeNotifier {
     final refe = FirebaseStorage.instance.ref().child(name + '.jpg');
     var imgUrl = await refe.getDownloadURL();
 
-    print(imgUrl);
     return imgUrl;
   }
 
 
-  Future<DocumentReference?> groupRequest(String type, String email, String instrument, String content) async {
+
+
+  Future groupRequest(String type, String email, String instrument, String content) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     String groupEmail;
 
@@ -557,7 +559,7 @@ class ApplicationState extends ChangeNotifier {
       groupEmail =allData[0]['captain_email'].toString();
     }
 
-    return FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('notification')
         .add(<String, dynamic>{
       'sender_email': FirebaseAuth.instance.currentUser!.email,
@@ -567,6 +569,7 @@ class ApplicationState extends ChangeNotifier {
       'created': FieldValue.serverTimestamp(),
       'content':content,
     });
+    notifyListeners();
   }
 
 
@@ -599,7 +602,6 @@ class ApplicationState extends ChangeNotifier {
 
   }
   Future<void> updateloc(String id) async {
-    print("updateloc");
     if (_loginState != ApplicationLoginState.loggedIn) {
       throw Exception('Must be logged in');
     }
@@ -631,8 +633,26 @@ class ApplicationState extends ChangeNotifier {
       'long':tmploc.longitude,
       'lat':tmploc.latitude,
     });
-    //notifyListeners();
+    notifyListeners();
   }
+  Future changeGenre(String input) async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    QuerySnapshot quer = await FirebaseFirestore.instance.collection('user').where("email", isEqualTo: auth.currentUser!.email.toString()).get();
+    List allData = quer.docs.map((doc) => doc.data()).toList();
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .where('email', isEqualTo: auth.currentUser!.email.toString())
+        .get()
+        .then((snapshot) {
+      snapshot.docs.single.reference.update({'genre': input});
+    });
+
+    notifyListeners();
+
+  }
+
+
   Future<List> getMusic() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     List newL= [];
@@ -646,7 +666,6 @@ class ApplicationState extends ChangeNotifier {
     QuerySnapshot querys = await FirebaseFirestore.instance.collection('user').where("email", isEqualTo: auth.currentUser!.email.toString()).get();
     List fulData = querys.docs.map((doc) => doc.data()).toList();
     newL.add(fulData[0]['genre']);
-    print(newL);
     return newL;
   }
 
@@ -682,8 +701,6 @@ class ApplicationState extends ChangeNotifier {
               .listen((snapshot) {
             _EventList = [];
             for (final document in snapshot.docs) {
-              //print(today);
-              //print(document.data()['date']);
               if(today==document.data()['date']) {
                 _EventList.add(
                   Event(

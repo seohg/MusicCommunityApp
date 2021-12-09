@@ -24,17 +24,19 @@ class GroupPageState extends State<GroupPage> {
   late File imageReal;
 
   Future getImage() async {
+
     final image = await _picker.getImage(source: ImageSource.gallery);
     if (image == null) return;
     final imageTemporary = File(image.path);
     setState(() => this.imageReal = imageTemporary);
 
     QuerySnapshot query = await FirebaseFirestore.instance
-        .collection('group')
+        .collection('band')
         .where("captain_email", isEqualTo: auth.currentUser!.email)
         .get();
     List allData = query.docs.map((doc) => doc.data()).toList();
     String name = allData[0]["group_name"];
+
 
     FirebaseStorage storage = FirebaseStorage.instance;
     Reference ref = storage.ref().child(name + '.jpg');
@@ -43,6 +45,8 @@ class GroupPageState extends State<GroupPage> {
       res.ref.getDownloadURL();
     });
   }
+
+
 
   Future<bool> groupChecker() async {
     bool checker = true;
@@ -551,6 +555,43 @@ class GroupPageState extends State<GroupPage> {
                                   ),
                                   onPressed: () {
                                     getImage();
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            content: Stack(
+                                              overflow: Overflow.visible,
+                                              children: <Widget>[
+                                                Column(
+                                                  mainAxisSize:
+                                                  MainAxisSize.min,
+                                                  children: [
+                                                    Padding(
+                                                        padding:
+                                                        EdgeInsets.all(8.0),
+                                                        child: Text(
+                                                          "Please Hold On",
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                              FontWeight
+                                                                  .bold),
+                                                        )),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+
+
+                                    Navigator.pop(context);
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) => GroupPage()));
+                                    sleep(Duration(milliseconds:1000));
+                                    Navigator.pop(context);
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) => GroupPage()));
                                   },
                                   style: ButtonStyle(
                                       backgroundColor:

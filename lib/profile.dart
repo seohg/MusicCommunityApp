@@ -22,6 +22,8 @@ class ProfilePageState extends State<ProfilePage> {
   late bool edit = true;
   final _statusController = TextEditingController();
 
+  final _primaryController = TextEditingController();
+
 
   String s = "";
   String loc = "";
@@ -78,7 +80,7 @@ class ProfilePageState extends State<ProfilePage> {
             builder: (BuildContext context, int val, Widget? child) {
               if(counter.value==1) {
                 return Positioned(
-                  bottom: 50.0,
+                  top: 50.0,
                   left: 60.0,
                   right: 60,
                   child: SizedBox(
@@ -235,7 +237,7 @@ class ProfilePageState extends State<ProfilePage> {
               }
               else if(counter.value==2) {
                 return Positioned(
-                  bottom: 50.0,
+                  top: 50.0,
                   left: 60.0,
                   right: 60,
                   child: SizedBox(
@@ -251,7 +253,6 @@ class ProfilePageState extends State<ProfilePage> {
                               FutureBuilder(
                                   future: appState.getGroup(),
                                   builder: (BuildContext context, AsyncSnapshot url) {
-                                    print(url.data);
                                     if (url.hasData == false) {
                                       return Container(
                                           alignment:Alignment.center,
@@ -411,7 +412,7 @@ class ProfilePageState extends State<ProfilePage> {
               }
               else if(counter.value==0) {
                 return Positioned(
-                  bottom: 50.0,
+                  top: 50.0,
                   left: 60.0,
                   right: 60,
                   child: SizedBox(
@@ -427,7 +428,6 @@ class ProfilePageState extends State<ProfilePage> {
                             FutureBuilder(
                                 future: appState.getMusic(),
                                 builder: (BuildContext context, AsyncSnapshot url) {
-                                  print(url.data);
                                   if (url.hasData == false) {
                                     return Container(
                                         alignment:Alignment.center,
@@ -523,6 +523,86 @@ class ProfilePageState extends State<ProfilePage> {
                                                   color: Colors.black,
                                                 ),
                                               ),
+                                              TextButton(
+                                                child: Text(
+                                                  "Genre update",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          content: Stack(
+                                                            overflow: Overflow.visible,
+                                                            children: <Widget>[
+                                                              Positioned(
+                                                                right: -40.0,
+                                                                top: -40.0,
+                                                                child: InkResponse(
+                                                                  onTap: () {
+                                                                    _primaryController
+                                                                        .clear();
+                                                                    Navigator.of(context)
+                                                                        .pop();
+                                                                  },
+                                                                  child: CircleAvatar(
+                                                                    child: Icon(Icons.close),
+                                                                    backgroundColor:
+                                                                    Colors.red,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Column(
+                                                                mainAxisSize:
+                                                                MainAxisSize.min,
+                                                                children: [
+                                                                  Padding(
+                                                                      padding:
+                                                                      EdgeInsets.all(8.0),
+                                                                      child: Text(
+                                                                        "My Genre",
+                                                                        style: TextStyle(
+                                                                            fontSize: 18,
+                                                                            fontWeight:
+                                                                            FontWeight
+                                                                                .bold),
+                                                                      )),
+                                                                  Padding(
+                                                                    padding:
+                                                                    EdgeInsets.all(2.0),
+                                                                    child: TextFormField(
+                                                                      controller:
+                                                                      _primaryController,
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding:
+                                                                    const EdgeInsets.all(
+                                                                        4.0),
+                                                                    child: RaisedButton(
+                                                                      child: Text("Change"),
+                                                                      onPressed: () {
+                                                                        appState.changeGenre(
+                                                                            _primaryController
+                                                                                .text,);
+                                                                        _primaryController.clear();
+                                                                        Navigator.pop(context);
+                                                                      },
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      });
+                                                },
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -539,7 +619,7 @@ class ProfilePageState extends State<ProfilePage> {
                 );
               }
               return Positioned(
-                bottom: 50.0,
+                top:50,
                 left: 60.0,
                 right: 60,
                 child: SizedBox(
@@ -712,7 +792,6 @@ class ProfilePageState extends State<ProfilePage> {
             counter.value++;
           else
             counter.value=0;
-          print(counter);
         },
         label: const Text('Move to Next Info'),
         icon: const Icon(Icons.arrow_right),
