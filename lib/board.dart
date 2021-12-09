@@ -246,11 +246,9 @@ class DetailPageState extends State<DetailPage> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat,long), 14));
   }
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.4537251, 126.7960716),
-    zoom: 14.4746,
-  );
+  late CameraPosition _kGooglePlex;
   List<Marker> _markers = [];
 
   DetailPageState(Product product){
@@ -275,13 +273,21 @@ class DetailPageState extends State<DetailPage> {
         _markers.add(Marker(
             markerId: MarkerId("1"),
             draggable: true,
+            consumeTapEvents: true,
             onTap: () => print("Marker!"),
             position: LatLng(lat, long)));
       });
     });
+
+    _kGooglePlex = CameraPosition(
+      target: LatLng(lat, long),
+      zoom: 14.4746,
+    );
+
   }
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       //key: _scaffoldKey,
 
@@ -342,6 +348,7 @@ class DetailPageState extends State<DetailPage> {
       ),
       body: Consumer<ApplicationState>(
         builder: (context, appState, _) =>ListView(
+
             children: [
 
               Padding(
@@ -466,13 +473,19 @@ class DetailPageState extends State<DetailPage> {
                                 width: MediaQuery.of(context).size.width-120,  // or use fixed size like 200
                                 height: 120,
                                 child: GoogleMap(
+                                  onMapCreated: _onMapCreated,
                                   mapType: MapType.normal,
                                   markers: Set.from(_markers),
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(36.102163,129.390900),
-                                    zoom: 14.4746,
-                                  ),
-                                  onCameraMove: (_) {},
+                                  initialCameraPosition: _kGooglePlex,
+                                  onCameraMove: (_) {
+                                    setState(() {
+                                      //mapController.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat,long), 14));
+                                      _kGooglePlex = CameraPosition(
+                                        target: LatLng(lat, long),
+                                        zoom: 14.4746,
+                                      );
+                                    });
+                                  },
                                   myLocationButtonEnabled: false,
                                 ),),
                             ],
